@@ -16,44 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <NetDesign/MenuController.hpp>
+#ifndef NETD_PROJECT_CONTROLLER_HPP
+#define NETD_PROJECT_CONTROLLER_HPP
 
 
 namespace netd {
 
-void MenuController::onProjectNew(void) noexcept
+class ProjectController
 {
-    m_projectController.onNew();
-}
+    public:
+        ProjectController(void) noexcept = default;
 
-void MenuController::onProjectOpen(void) noexcept
-{
-    m_projectController.onOpen();
-}
+        /** @brief New action handler.*/
+        void onNew(void) noexcept;
 
-void MenuController::onProjectSave(void) noexcept
-{
-    m_projectController.onSave();
-}
+        /** @brief Open action handler.*/
+        void onOpen(void) noexcept;
 
-void MenuController::onProjectExit(void) noexcept
-{
-    m_projectController.onExit();
-}
+        /** @brief Save action handler.*/
+        void onSave(void) noexcept;
 
-void MenuController::onEditLoadFile(void) noexcept
-{
-
-}
-
-void MenuController::onInfoDocs(void) noexcept
-{
-
-}
-
-void MenuController::onInfoAbout(void) noexcept
-{
-
-}
+        /** @brief Exit action handler.*/
+        void onExit(void) noexcept;
+};
 
 } // namespace netd
+
+#endif // NETD_PROJECT_CONTROLLER_HPP

@@ -19,24 +19,22 @@
 #ifndef NETD_MENU_CONTROLLER_HPP
 #define NETD_MENU_CONTROLLER_HPP
 
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenuBar>
+#include <NetDesign/ProjectController.hpp>
 
 
 namespace netd {
 
-class MenuController : public QObject
+class MenuController
 {
-    public:
-        MenuController(void) noexcept;
+    ProjectController m_projectController;
 
+    public:
+        MenuController(void) noexcept = default;
         void onProjectNew(void) noexcept;
         void onProjectOpen(void) noexcept;
         void onProjectSave(void) noexcept;
         void onProjectExit(void) noexcept;
-
         void onEditLoadFile(void) noexcept;
-
         void onInfoDocs(void) noexcept;
         void onInfoAbout(void) noexcept;
 };
