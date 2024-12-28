@@ -16,31 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NETD_MENU_CONTROLLER_HPP
-#define NETD_MENU_CONTROLLER_HPP
-
-#include <NetDesign/ProjectController.hpp>
-#include <NetDesign/EditController.hpp>
+#ifndef NETD_EDIT_CONTROLLER_HPP
+#define NETD_EDIT_CONTROLLER_HPP
 
 
 namespace netd {
 
-class MenuController
+class EditController
 {
-    ProjectController m_projectController;
-    EditController    m_editController;
-
     public:
-        MenuController(void) noexcept = default;
-        void onProjectNew(void) noexcept;
-        void onProjectOpen(void) noexcept;
-        void onProjectSave(void) noexcept;
-        void onProjectExit(void) noexcept;
-        void onEditLoadFile(void) noexcept;
-        void onInfoDocs(void) noexcept;
-        void onInfoAbout(void) noexcept;
+        EditController(void) noexcept = default;
+
+        /** @brief Load file action handler.*/
+        void onLoadFile(void) noexcept;
 };
 
 } // namespace netd
 
-#endif // NETD_MENU_CONTROLLER_HPP
+#endif // NETD_EDIT_CONTROLLER_HPP

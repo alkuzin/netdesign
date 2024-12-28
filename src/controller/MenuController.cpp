@@ -43,7 +43,7 @@ void MenuController::onProjectExit(void) noexcept
 
 void MenuController::onEditLoadFile(void) noexcept
 {
-
+    m_editController.onLoadFile();
 }
 
 void MenuController::onInfoDocs(void) noexcept
