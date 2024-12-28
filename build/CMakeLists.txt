@@ -19,8 +19,9 @@ set(CONTROLLER_DIR  ${SRC_DIR}/controller)
 
 # Project source files
 set(SRCS
-    "${CONTROLLER_DIR}/EditController.cpp"
     "${CONTROLLER_DIR}/ProjectController.cpp"
+    "${CONTROLLER_DIR}/EditController.cpp"
+    "${CONTROLLER_DIR}/InfoController.cpp"
     "${CONTROLLER_DIR}/MenuController.cpp"
     "${VIEW_DIR}/MainWindow.cpp"
     "${SRC_DIR}/Main.cpp"

@@ -21,6 +21,7 @@
 
 #include <NetDesign/ProjectController.hpp>
 #include <NetDesign/EditController.hpp>
+#include <NetDesign/InfoController.hpp>
 
 
 namespace netd {
@@ -29,15 +30,30 @@ class MenuController
 {
     ProjectController m_projectController;
     EditController    m_editController;
+    InfoController    m_infoController;
 
     public:
         MenuController(void) noexcept = default;
+
+        /** @brief "Project" New action handler.*/
         void onProjectNew(void) noexcept;
+
+        /** @brief "Project" Open action handler.*/
         void onProjectOpen(void) noexcept;
+
+        /** @brief "Project" Save action handler.*/
         void onProjectSave(void) noexcept;
+
+        /** @brief "Project" Exit action handler.*/
         void onProjectExit(void) noexcept;
+
+        /** @brief "Edit" Load file action handler.*/
         void onEditLoadFile(void) noexcept;
+
+        /** @brief "Info" Documentation action handler.*/
         void onInfoDocs(void) noexcept;
+
+        /** @brief "Info" About action handler.*/
         void onInfoAbout(void) noexcept;
 };
 
