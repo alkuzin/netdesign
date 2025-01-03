@@ -1,57 +1,53 @@
 cmake_minimum_required(VERSION 3.10.0)
 
-# Set project name
+# setting project name
 set(PROJECT_NAME NetDesign)
 project(${PROJECT_NAME})
 
-set(CMAKE_CXX_STANDARD 23)          # Using C++23 standard
-set(CMAKE_CXX_STANDARD_REQUIRED ON) # Enforce the standard
-set(CMAKE_CXX_EXTENSIONS OFF)       # Disable compiler-specific extensions
+set(CMAKE_C_STANDARD 23)          # using C23 standard
+set(CMAKE_C_STANDARD_REQUIRED ON) # enforce the standard
+set(CMAKE_C_EXTENSIONS OFF)       # disable compiler-specific extensions
 
-cmake_policy(SET CMP0167 NEW)       # Set the policy to suppress the warning
+# project paths
+set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/../include)
+set(SRC_DIR     ${CMAKE_SOURCE_DIR}/../src)
+set(MENU_DIR    ${SRC_DIR}/menu)
 
-# Project paths
-set(INCLUDE_DIR     ${CMAKE_SOURCE_DIR}/../include)
-set(SRC_DIR         ${CMAKE_SOURCE_DIR}/../src)
-set(MODEL_DIR       ${SRC_DIR}/model)
-set(VIEW_DIR        ${SRC_DIR}/view)
-set(CONTROLLER_DIR  ${SRC_DIR}/controller)
-
-# Project source files
+# project source files
 set(SRCS
-    "${CONTROLLER_DIR}/ProjectController.cpp"
-    "${CONTROLLER_DIR}/EditController.cpp"
-    "${CONTROLLER_DIR}/InfoController.cpp"
-    "${CONTROLLER_DIR}/MenuController.cpp"
-    "${VIEW_DIR}/MainWindow.cpp"
-    "${SRC_DIR}/Main.cpp"
+    "${MENU_DIR}/estimate.c"
+    "${MENU_DIR}/project.c"
+    "${MENU_DIR}/edit.c"
+    "${MENU_DIR}/info.c"
+    "${SRC_DIR}/load_matrix.c"
+    "${SRC_DIR}/parser.c"
+    "${SRC_DIR}/utils.c"
+    "${SRC_DIR}/main.c"
+    "${SRC_DIR}/app.c"
 )
 
-# Include directories
-include_directories(${INCLUDE_DIR})
+# finding the GTK package
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 
-# Connect Qt & Boost libraries
-find_package(Qt6 REQUIRED COMPONENTS Widgets Charts)
-find_package(Boost REQUIRED COMPONENTS system filesystem)
+# setting include directories
+include_directories(${INCLUDE_DIR} ${GTK3_INCLUDE_DIRS})
 
-# Create the executable
+# adding the executable
 add_executable(${PROJECT_NAME} ${SRCS})
 
-set(CXXFLAGS
-    "-Wall"         # Enable all compiler's warning messages
-    "-Wextra"       # Enable additional warning messages not covered by -Wall
-    "-Werror"       # Treat all warnings as errors
-    "-Wpedantic"    # Enable strict ISO C++ compliance warnings
-    "-Wconversion"  # Enable warnings for implicit type conversions
-    "-fanalyzer"    # Enable the static analyzer in the compiler
-    "-std=c++23"    # Use the C++23 standard
-    "-O2"           # Optimize the code for performance (level 2 optimization)
-    "-g"            # Generate debug information
+# setting compiler flags
+target_compile_options(${PROJECT_NAME} PRIVATE
+    "-Wall"         # enable all compiler's warning messages
+    "-Wextra"       # enable additional warning messages not covered by -Wall
+    "-Werror"       # treat all warnings as errors
+    "-Wpedantic"    # enable strict ISO C compliance warnings
+    "-Wconversion"  # enable warnings for implicit type conversions
+    "-fanalyzer"    # enable the static analyzer in the compiler
+    "-std=c23"      # use the C23 standard
+    "-O2"           # optimize the code for performance (level 2 optimization)
+    "-g"            # generate debug information
 )
 
-# Set compiler flags
-target_compile_options(${PROJECT_NAME} PRIVATE ${CXXFLAGS})
-
-# Link the Qt & Boost libraries to the executable
-target_link_libraries(${PROJECT_NAME} Qt6::Widgets Qt6::Charts)
-target_link_libraries(${PROJECT_NAME} Boost::system Boost::filesystem)
+# linking the GTK libraries
+target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES})
