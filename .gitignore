@@ -9,3 +9,4 @@ build/NetDesign
 *.so
 *.csv
 *.txt
+*.ndproj
