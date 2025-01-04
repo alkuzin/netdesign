@@ -19,11 +19,21 @@
 #ifndef NET_DESIGN_TABS_HPP
 #define NET_DESIGN_TABS_HPP
 
+#include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QTabWidget>
 
 
 namespace netd {
 namespace tab {
+
+struct SettingsTab {
+    QHBoxLayout    *mainLayout;
+    QStackedWidget *content;
+    QListWidget    *list;
+    QTabWidget     *tab;
+};
 
 QTabWidget *setSettingsTab(void) noexcept;
 QTabWidget *setGraphTab(void) noexcept;
