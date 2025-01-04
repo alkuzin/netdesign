@@ -23,7 +23,7 @@
 #include <NetDesign/Channel.hpp>
 #include <NetDesign/Router.hpp>
 #include <NetDesign/Node.hpp>
-#include <list>
+#include <vector>
 
 
 namespace netd {
@@ -32,9 +32,9 @@ namespace ublas = boost::numeric::ublas;
 
 struct ProjectContext {
     ublas::matrix<uint32_t> loadMatrix;
-    std::list<Node>         nodes;
-    std::list<Router>       routers;
-    std::list<Channel>      channels;
+    std::vector<Channel>    channels;
+    std::vector<Router>     routers;
+    std::vector<Node>       nodes;
     uint32_t                packetSize;
 };
 
