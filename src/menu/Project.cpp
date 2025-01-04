@@ -1,6 +1,6 @@
 /**
  * NetDesign - simple network design tool.
- * Copyright (C) 2025 Alexander (@alkuzin)
+ * Copyright (C) 2024-2025 Alexander (@alkuzin)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_DESIGN_CHANNEL_H
-#define NET_DESIGN_CHANNEL_H
-
-#include <stdint.h>
+#include <QtWidgets/QApplication>
+#include <NetDesign/Menu.hpp>
 
 
-struct channel {
-    uint32_t id;
-    uint32_t bandwidth;
-    uint32_t price;
-};
+namespace netd {
+namespace menu {
 
-typedef struct channel channel_t;
+void onProjectNew(void) noexcept
+{
+    // TODO:
+}
 
-#endif // NET_DESIGN_CHANNEL_H
+void onProjectOpen(void) noexcept
+{
+    // TODO:
+}
+
+void onProjectSave(void) noexcept
+{
+    // TODO convert XML to ProjectContext
+    // convertToXML(xml_filename, project_context);
+}
+
+void onProjectExit(void) noexcept
+{
+    // TODO: ask if user sure to exit and ask him to save project
+    QApplication::quit();
+}
+
+} // namespace menu
+} // namespace netd

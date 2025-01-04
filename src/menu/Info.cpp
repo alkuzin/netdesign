@@ -1,6 +1,6 @@
 /**
  * NetDesign - simple network design tool.
- * Copyright (C) 2025 Alexander (@alkuzin)
+ * Copyright (C) 2024-2025 Alexander (@alkuzin)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,21 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_DESIGN_ROUTER_H
-#define NET_DESIGN_ROUTER_H
-
-#include <stdint.h>
+#include <NetDesign/Menu.hpp>
 
 
-#define ROUTER_MODEL_SIZE 64
+namespace netd {
+namespace menu {
 
-struct router {
-    uint32_t id;
-    char     model[ROUTER_MODEL_SIZE];
-    uint32_t bandwidth; // (KB/sec)
-    uint32_t price;
-};
+void onInfoDocs(void) noexcept
+{
+    // TODO:
+}
 
-typedef struct router router_t;
+void onInfoAbout(void) noexcept
+{
+    // TODO:
+}
 
-#endif // NET_DESIGN_ROUTER_H
+} // namespace menu
+} // namespace netd

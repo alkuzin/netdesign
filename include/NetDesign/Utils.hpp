@@ -1,6 +1,6 @@
 /**
  * NetDesign - simple network design tool.
- * Copyright (C) 2025 Alexander (@alkuzin)
+ * Copyright (C) 2024-2025 Alexander (@alkuzin)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,26 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_DESIGN_PROJECT_CONTEXT_H
-#define NET_DESIGN_PROJECT_CONTEXT_H
+#ifndef NET_DESIGN_UTILS_HPP
+#define NET_DESIGN_UTILS_HPP
 
-#include <netdesign/load_matrix.h>
-#include <netdesign/channel.h>
-#include <netdesign/router.h>
-#include <netdesign/node.h>
+#include <NetDesign/ProjectContext.hpp>
+#include <QtXml/QDomDocument>
+#include <string>
 
 
-struct project_context {
-    node_t         *nodes;
-    load_matrix_t  *matrix;
-    router_t       *router_table;
-    channel_t      *channel_table;
-    uint32_t        nodes_count;
-    uint32_t        routers_count;
-    uint32_t        channels_count;
-    uint32_t        packet_size;
-};
+namespace netd {
 
-typedef struct project_context proj_context_t;
+template<typename... Args>
+void IGNORE_UNUSED(Args&&...) { /* do nothing */ }
 
-#endif // NET_DESIGN_PROJECT_CONTEXT_H
+void convertToXML(const std::string_view& filename, const ProjectContext& context) noexcept;
+void convertToContext(const std::string_view& filename, ProjectContext& context) noexcept;
+
+} // namespace netd
+
+#endif // NET_DESIGN_UTILS_HPP

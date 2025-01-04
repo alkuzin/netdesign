@@ -1,6 +1,6 @@
 /**
  * NetDesign - simple network design tool.
- * Copyright (C) 2025 Alexander (@alkuzin)
+ * Copyright (C) 2024-2025 Alexander (@alkuzin)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_DESIGN_H
-#define NET_DESIGN_H
+#ifndef NET_DESIGN_MAIN_WINDOW_HPP
+#define NET_DESIGN_MAIN_WINDOW_HPP
 
-#define NETD_APP_TITLE   "NetDesign"
-#define NETD_APP_WIDTH   1024
-#define NETD_APP_HEIGHT  768
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenuBar>
 
-#endif // NET_DESIGN_H
+
+namespace netd {
+
+class MainWindow : public QMainWindow {
+    QTabWidget *m_tabWidget;
+    QMenuBar   *m_menuBar;
+
+    private:
+        void initMenuBar(void) noexcept;
+        void initTabs(void) noexcept;
+
+    public:
+        MainWindow(void) noexcept;
+};
+
+} // namespace netd
+
+#endif // NET_DESIGN_MAIN_WINDOW_HPP

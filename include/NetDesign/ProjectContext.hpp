@@ -1,6 +1,6 @@
 /**
  * NetDesign - simple network design tool.
- * Copyright (C) 2025 Alexander (@alkuzin)
+ * Copyright (C) 2024-2025 Alexander (@alkuzin)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,15 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_DESIGN_MENU_H
-#define NET_DESIGN_MENU_H
-
-#include <netdesign/app.h>
+#ifndef NET_DESIGN_PROJECT_CONTEXT_HPP
+#define NET_DESIGN_PROJECT_CONTEXT_HPP
 
 
-void netd_set_project_menu(void);
-void netd_set_edit_menu(void);
-void netd_set_estimate_menu(void);
-void netd_set_info_menu(void);
+namespace netd {
 
-#endif // NET_DESIGN_MENU_H
+struct ProjectContext {
+
+};
+
+extern ProjectContext projectContext;
+
+} // namespace netd
+
+#endif // NET_DESIGN_PROJECT_CONTEXT_HPP

@@ -1,6 +1,6 @@
 /**
  * NetDesign - simple network design tool.
- * Copyright (C) 2025 Alexander (@alkuzin)
+ * Copyright (C) 2024-2025 Alexander (@alkuzin)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,21 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_DESIGN_NODE_H
-#define NET_DESIGN_NODE_H
+#include <NetDesign/MainWindow.hpp>
+#include <QtWidgets/QApplication>
+#include <cstdint>
 
-#include <stdint.h>
 
+int32_t main(int32_t argc, char **argv)
+{
+    QApplication app(argc, argv);
+    netd::MainWindow window;
 
-#define NODE_NAME_SIZE 16
-
-struct node {
-    char     name[NODE_NAME_SIZE];
-    uint32_t id;
-    uint32_t x;
-    uint32_t y;
-};
-
-typedef struct node node_t;
-
-#endif // NET_DESIGN_NODE_H
+    return app.exec();
+}

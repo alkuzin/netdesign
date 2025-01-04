@@ -1,6 +1,6 @@
 /**
  * NetDesign - simple network design tool.
- * Copyright (C) 2025 Alexander (@alkuzin)
+ * Copyright (C) 2024-2025 Alexander (@alkuzin)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_DESIGN_PARSER_H
-#define NET_DESIGN_PARSER_H
-
-#include <netdesign/project_context.h>
+#include <NetDesign/Menu.hpp>
 
 
-void netd_parse_project_file(const char *filename, proj_context_t *context);
+namespace netd {
+namespace menu {
 
-#endif // NET_DESIGN_PARSER_H
+void onEditLoadFile(void) noexcept
+{
+    // TODO:
+}
+
+} // namespace menu
+} // namespace netd
