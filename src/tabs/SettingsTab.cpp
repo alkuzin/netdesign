@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <NetDesign/ProjectContext.hpp>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QListWidget>
@@ -24,16 +25,17 @@
 #include <QtWidgets/QLineEdit>
 #include <NetDesign/Tabs.hpp>
 #include <QtWidgets/QLabel>
+#include <print>
 
 
 namespace netd {
 namespace tab {
 
 struct SettingsTab {
-    QTabWidget     *tab;
     QHBoxLayout    *mainLayout;
-    QListWidget    *list;
     QStackedWidget *content;
+    QListWidget    *list;
+    QTabWidget     *tab;
 };
 
 static void setNodeSettings(SettingsTab& settings) noexcept;
@@ -103,11 +105,10 @@ static void setNodeCount(QWidget *nodeSettings, QVBoxLayout *nodeLayout) noexcep
     // connecting the button's clicked signal
     QObject::connect(submitButton, &QPushButton::clicked, [lineEdit]() {
         bool ok;
-        int numberOfNodes = lineEdit->text().toInt(&ok);
+        uint32_t nodeCount = lineEdit->text().toUInt(&ok);
 
-        // TODO: add nodes count to ProjectContext
         if (ok)
-            QMessageBox::information(nullptr, "Input", "Number of nodes: " + QString::number(numberOfNodes));
+            projectContext.nodes.resize(nodeCount);
         else
             QMessageBox::warning(nullptr, "Input Error", "Please enter a valid number");
     });

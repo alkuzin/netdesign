@@ -16,10 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <NetDesign/ProjectContext.hpp>
 #include <NetDesign/MainWindow.hpp>
 #include <QtWidgets/QApplication>
 #include <cstdint>
 
+
+namespace netd {
+
+netd::ProjectContext projectContext;
+
+} // namespace netd
 
 int32_t main(int32_t argc, char **argv)
 {
