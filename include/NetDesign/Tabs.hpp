@@ -16,21 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <NetDesign/Menu.hpp>
+#ifndef NET_DESIGN_TABS_HPP
+#define NET_DESIGN_TABS_HPP
+
+#include <QtWidgets/QTabWidget>
 
 
 namespace netd {
-namespace menu {
+namespace tab {
 
-void onInfoDocs(void) noexcept
-{
-    // TODO:
-}
+QTabWidget *setSettingsTab(void) noexcept;
+QTabWidget *setGraphTab(void) noexcept;
 
-void onInfoAbout(void) noexcept
-{
-    // TODO:
-}
-
-} // namespace menu
+} // namespace tab
 } // namespace netd
+
+#endif // NET_DESIGN_TABS_HPP

@@ -14,9 +14,12 @@ cmake_policy(SET CMP0167 NEW)       # setting the policy to suppress the warning
 set(INCLUDE_DIR     ${CMAKE_SOURCE_DIR}/../include)
 set(SRC_DIR         ${CMAKE_SOURCE_DIR}/../src)
 set(MENU_DIR        ${SRC_DIR}/menu)
+set(TABS_DIR        ${SRC_DIR}/tabs)
 
 # setting project source files
 set(SRCS
+    "${TABS_DIR}/SettingsTab.cpp"
+    "${TABS_DIR}/GraphTab.cpp"
     "${MENU_DIR}/Project.cpp"
     "${MENU_DIR}/Edit.cpp"
     "${MENU_DIR}/Info.cpp"

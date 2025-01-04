@@ -1,6 +1,6 @@
 /**
  * NetDesign - simple network design tool.
- * Copyright (C) 2024-2025 Alexander (@alkuzin)
+ * Copyright (C) 2025 Alexander (@alkuzin)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #include <NetDesign/MainWindow.hpp>
 #include <NetDesign/Utils.hpp>
 #include <NetDesign/Menu.hpp>
+#include <NetDesign/Tabs.hpp>
 
 
 namespace netd {
@@ -80,9 +81,8 @@ void MainWindow::initMenuBar(void) noexcept
 
 void MainWindow::initTabs(void) noexcept
 {
-    // TODO:
-    // NodeTabView *nodeTabView = new NodeTabView(m_projectContext);
-    // m_tabWidget->addTab(nodeTabView, "Node");
+    m_tabWidget->addTab(tab::setSettingsTab(), "Settings");
+    m_tabWidget->addTab(tab::setGraphTab(), "Graph");
 }
 
 } // namespace netd

@@ -16,21 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <NetDesign/Menu.hpp>
+#include <NetDesign/Tabs.hpp>
 
 
 namespace netd {
-namespace menu {
+namespace tab {
 
-void onInfoDocs(void) noexcept
+QTabWidget *setSettingsTab(void) noexcept
 {
-    // TODO:
+    QTabWidget *tab = new QTabWidget();
+    return tab;
 }
 
-void onInfoAbout(void) noexcept
-{
-    // TODO:
-}
-
-} // namespace menu
+} // namespace tab
 } // namespace netd
