@@ -51,13 +51,18 @@ QTabWidget *setSettingsTab(void) noexcept
 
     setNodeSettings(settings);
 
-    // Connect the list widget selection to change the stacked widget
+    // connecting the list widget selection to change the stacked widget
     settings.tab->connect(
         settings.list,
         &QListWidget::currentRowChanged,
         settings.content,
         &QStackedWidget::setCurrentIndex
     );
+
+    // changing font size of list widget entries
+    QFont font = settings.list->font();
+    font.setPointSize(18);
+    settings.list->setFont(font);
 
     settings.mainLayout->addWidget(settings.list);
     settings.mainLayout->addWidget(settings.content);

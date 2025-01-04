@@ -16,30 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_DESIGN_PROJECT_CONTEXT_HPP
-#define NET_DESIGN_PROJECT_CONTEXT_HPP
+#ifndef NET_DESIGN_ROUTER_HPP
+#define NET_DESIGN_ROUTER_HPP
 
-#include <boost/numeric/ublas/matrix.hpp>
-#include <NetDesign/Channel.hpp>
-#include <NetDesign/Router.hpp>
-#include <NetDesign/Node.hpp>
-#include <list>
+#include <cstdint>
+#include <string>
 
 
 namespace netd {
 
-namespace ublas = boost::numeric::ublas;
-
-struct ProjectContext {
-    ublas::matrix<uint32_t> loadMatrix;
-    std::list<Node>         nodes;
-    std::list<Router>       routers;
-    std::list<Channel>      channels;
-    uint32_t                packetSize;
+struct Router {
+    std::string model;
+    uint32_t    capacity;
+    uint32_t    price;
+    uint32_t    id;
 };
-
-extern ProjectContext projectContext;
 
 } // namespace netd
 
-#endif // NET_DESIGN_PROJECT_CONTEXT_HPP
+#endif // NET_DESIGN_ROUTER_HPP
