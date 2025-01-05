@@ -29,15 +29,16 @@ namespace netd {
 class NodeSettings {
     QWidget      *mainWidget;
     QVBoxLayout  *mainLayout;
-    QTableWidget *table;
+    QTableWidget *nodeTable;
+    QTableWidget *matrixTable;
 
     public:
         NodeSettings(tab::SettingsTab& settings) noexcept;
 
     private:
         void setNodeCount(void) noexcept;
-        void updateTable(void) noexcept;
-        void saveTable(void) noexcept;
+        void updateTables(void) noexcept;
+        void saveTables(void) noexcept;
 };
 
 } // namespace netd

@@ -29,23 +29,30 @@ namespace netd {
 
 NodeSettings::NodeSettings(tab::SettingsTab& settings) noexcept
 {
-    settings.list->addItem("Node");
+    settings.list->addItem("Node & Load Matrix");
 
-    mainWidget = new QWidget();
-    mainLayout = new QVBoxLayout(mainWidget);
-    table      = new QTableWidget(0, 4, mainWidget);
+    mainWidget        = new QWidget();
+    mainLayout        = new QVBoxLayout(mainWidget);
+    nodeTable         = new QTableWidget(0, 4, mainWidget);
+    matrixTable       = new QTableWidget(0, 0, mainWidget);
+    auto tablesLayout = new QHBoxLayout();
 
-    table->setHorizontalHeaderLabels({"ID", "Name", "X", "Y"});
-    table->setMaximumWidth(420);
+    nodeTable->setHorizontalHeaderLabels({"ID", "Name", "X", "Y"});
+    nodeTable->setMaximumSize(425, 500);
+    matrixTable->setMaximumSize(900, 500);
 
     setNodeCount();
 
     auto saveButton = new QPushButton("Save");
     QObject::connect(saveButton, &QPushButton::clicked, [this]() {
-        this->saveTable();
+        this->saveTables();
     });
 
-    mainLayout->addWidget(table);
+    tablesLayout->addWidget(nodeTable);
+    tablesLayout->addWidget(matrixTable);
+    tablesLayout->setAlignment(Qt::AlignLeft);
+    mainLayout->addLayout(tablesLayout);
+
     mainLayout->addWidget(saveButton);
     settings.content->addWidget(mainWidget);
 }
@@ -74,70 +81,112 @@ void NodeSettings::setNodeCount(void) noexcept
 
         if (ok) {
             projectContext.nodes.resize(nodeCount);
-            this->updateTable();
+            this->updateTables();
         }
         else
             QMessageBox::warning(nullptr, "Input Error", "Please enter a valid number");
     });
+
+    layout->setAlignment(Qt::AlignLeft);
 
     mainLayout->addLayout(layout);
     mainLayout->setAlignment(Qt::AlignTop);
     mainWidget->setLayout(mainLayout);
 }
 
-void NodeSettings::updateTable(void) noexcept
+void NodeSettings::updateTables(void) noexcept
 {
     auto& nodes       = projectContext.nodes;
     int32_t nodeCount = static_cast<int32_t>(nodes.size());
 
     // preventing unintentional table update
-    if (table->rowCount() == nodeCount)
+    if (nodeTable->rowCount() == nodeCount)
         return;
 
     int32_t row = 0;
 
     // clear all entries, but save headers
-    table->setRowCount(0);
+    nodeTable->setRowCount(0);
+    matrixTable->setRowCount(0);
 
     for (int32_t i = 0; i < nodeCount; ++i) {
-        row = table->rowCount();
-        table->insertRow(row);
+        row = nodeTable->rowCount();
+        nodeTable->insertRow(row);
 
         // creating table items and setting them in the table
-        this->table->setItem(row, 0, new QTableWidgetItem("0"));
-        this->table->setItem(row, 1, new QTableWidgetItem("-"));
-        this->table->setItem(row, 2, new QTableWidgetItem("0"));
-        this->table->setItem(row, 3, new QTableWidgetItem("0"));
+        nodeTable->setItem(row, 0, new QTableWidgetItem("0"));
+        nodeTable->setItem(row, 1, new QTableWidgetItem("-"));
+        nodeTable->setItem(row, 2, new QTableWidgetItem("0"));
+        nodeTable->setItem(row, 3, new QTableWidgetItem("0"));
+    }
+
+    if (nodeCount == 0)
+        return;
+
+    auto& matrix = projectContext.loadMatrix;
+    matrix.clear();
+
+    matrix.resize(nodeCount, nodeCount, false);
+
+    matrixTable->setRowCount(nodeCount);
+    matrixTable->setColumnCount(nodeCount);
+
+    for (int32_t i = 0; i < nodeCount; i++) {
+        for (int32_t j = 0; j < nodeCount; j++)
+            matrixTable->setItem(i, j, new QTableWidgetItem("0"));
     }
 }
 
-static inline QString getItem(const QTableWidget *table, std::int32_t row, std::int32_t column) noexcept
+// TODO: move to utils
+static inline QString getItem(const QTableWidget *table, size_t row, size_t column) noexcept
 {
-    auto item = table->item(row, column);
+    auto item = table->item(
+        static_cast<int32_t>(row),
+        static_cast<int32_t>(column)
+    );
+
     return item->text();
 }
 
-void NodeSettings::saveTable(void) noexcept
+void NodeSettings::saveTables(void) noexcept
 {
     auto& nodes = projectContext.nodes;
     nodes.clear();
 
     Node node;
 
-    for (int32_t i = 0; i < table->rowCount(); i++) {
-        node.id   = getItem(table, i, 0).toInt();
-        node.name = getItem(table, i, 1).toStdString();
-        node.x    = getItem(table, i, 2).toUInt();
-        node.y    = getItem(table, i, 3).toUInt();
+    for (int32_t i = 0; i < nodeTable->rowCount(); i++) {
+        node.id   = getItem(nodeTable, i, 0).toInt();
+        node.name = getItem(nodeTable, i, 1).toStdString();
+        node.x    = getItem(nodeTable, i, 2).toUInt();
+        node.y    = getItem(nodeTable, i, 3).toUInt();
 
         nodes.push_back(node);
     }
 
+    // TODO: move to utils
     for (const auto& node : nodes) {
         std::println("[log] nodes: [ id: \'{}\', name: \'{}\', x: \'{}\', y: \'{}\' ]",
             node.id, node.name, node.x, node.y
         );
     }
+
+    auto& matrix = projectContext.loadMatrix;
+
+    for (size_t i = 0; i < matrix.size1(); i++) {
+        for (size_t j = 0; j < matrix.size2(); j++)
+            matrix(i, j) = getItem(matrixTable, i, j).toUInt();
+    }
+
+    // TODO: move to utils
+    std::putchar('\n');
+    for (size_t i = 0; i < matrix.size1(); i++) {
+        std::putchar('|');
+        for (size_t j = 0; j < matrix.size2(); j++)
+            std::print(" {:>3}", matrix(i, j));
+        std::puts("   |");
+    }
+    std::putchar('\n');
 }
 
 } // namespace netd
