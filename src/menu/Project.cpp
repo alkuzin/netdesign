@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <NetDesign/ProjectContext.hpp>
 #include <QtWidgets/QApplication>
+#include <NetDesign/Utils.hpp>
 #include <NetDesign/Menu.hpp>
 
 
@@ -35,8 +37,10 @@ void onProjectOpen(void) noexcept
 
 void onProjectSave(void) noexcept
 {
-    // TODO convert XML to ProjectContext
-    // convertToXML(xml_filename, project_context);
+    if (projectContext.filename.empty())
+        onProjectNew();
+
+    convertToXML(projectContext.filename, projectContext);
 }
 
 void onProjectExit(void) noexcept

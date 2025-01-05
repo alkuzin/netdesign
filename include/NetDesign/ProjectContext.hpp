@@ -36,6 +36,7 @@ struct ProjectContext {
     std::vector<Router>     routers;
     std::vector<Node>       nodes;
     uint32_t                packetSize;
+    std::string             filename;
 };
 
 extern ProjectContext projectContext;

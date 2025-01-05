@@ -26,6 +26,7 @@ set(SRCS
     "${MENU_DIR}/Edit.cpp"
     "${MENU_DIR}/Info.cpp"
     "${SRC_DIR}/MainWindow.cpp"
+    "${SRC_DIR}/Utils.cpp"
     "${SRC_DIR}/Main.cpp"
 )
 
