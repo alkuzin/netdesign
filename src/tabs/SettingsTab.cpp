@@ -17,6 +17,7 @@
  */
 
 #include <NetDesign/ProjectContext.hpp>
+#include <NetDesign/RouterSettings.hpp>
 #include <NetDesign/NodeSettings.hpp>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QListWidget>
@@ -40,7 +41,8 @@ QTabWidget *setSettingsTab(void) noexcept
     settings.list       = new QListWidget(settings.tab);
     settings.content    = new QStackedWidget(settings.tab);
 
-    static NodeSettings   nodeSettings(settings);
+    static NodeSettings nodeSettings(settings);
+    static RouterSettings routerSettings(settings);
 
     // connecting the list widget selection to change the stacked widget
     settings.tab->connect(

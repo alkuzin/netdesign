@@ -1,0 +1,244 @@
+/**
+ * NetDesign - simple network design tool.
+ * Copyright (C) 2025 Alexander (@alkuzin)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include <NetDesign/ProjectContext.hpp>
+#include <NetDesign/RouterSettings.hpp>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QMessageBox>
+#include <NetDesign/Channel.hpp>
+#include <NetDesign/Router.hpp>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QLabel>
+#include <print>
+
+
+namespace netd {
+
+RouterSettings::RouterSettings(tab::SettingsTab& settings) noexcept
+{
+    settings.list->addItem("Routers & Channels");
+    mainWidget = new QWidget();
+    mainLayout = new QVBoxLayout(mainWidget);
+
+    setTablesLayout();
+    settings.content->addWidget(mainWidget);
+}
+
+QVBoxLayout *RouterSettings::setRouterTableLayout(void) noexcept
+{
+    auto routerTableLayout = new QVBoxLayout();
+    routerTable  = new QTableWidget(0, 4, mainWidget);
+    routerTable->setHorizontalHeaderLabels({"ID", "Model", "Capacity", "Price"});
+    routerTable->setMaximumSize(425, 600);
+
+    auto routerTableLabel = new QLabel("Router Table");
+    routerTableLabel->setAlignment(Qt::AlignCenter);
+
+    auto addRouterTableButton = new QPushButton("Add");
+    QObject::connect(addRouterTableButton, &QPushButton::clicked, [this]() {
+        auto& table = this->routerTable;
+        auto row    = table->rowCount();
+
+        table->insertRow(row);
+        table->setItem(row, 0, new QTableWidgetItem(""));
+        table->setItem(row, 1, new QTableWidgetItem(""));
+        table->setItem(row, 2, new QTableWidgetItem(""));
+        table->setItem(row, 3, new QTableWidgetItem(""));
+    });
+
+    auto removeRouterTableButton = new QPushButton("Remove");
+    QObject::connect(removeRouterTableButton, &QPushButton::clicked, [this]() {
+        auto& table        = this->routerTable;
+        auto selectedItems = table->selectedItems();
+
+        if (!selectedItems.isEmpty()) {
+            auto row = selectedItems.first()->row();
+            table->removeRow(row);
+        }
+    });
+
+    auto saveRouterTableButton = new QPushButton("Save");
+    QObject::connect(saveRouterTableButton, &QPushButton::clicked, [this]() {
+        this->saveRouterTable();
+    });
+
+    routerTableLayout->addWidget(routerTableLabel);
+    routerTableLayout->addWidget(routerTable);
+    routerTableLayout->addWidget(addRouterTableButton);
+    routerTableLayout->addWidget(removeRouterTableButton);
+    routerTableLayout->addWidget(saveRouterTableButton);
+    routerTableLayout->setAlignment(Qt::AlignTop);
+
+    return routerTableLayout;
+}
+
+QVBoxLayout *RouterSettings::setChannelTableLayout(void) noexcept
+{
+    auto channelTableLayout = new QVBoxLayout();
+    channelTable = new QTableWidget(0, 3, mainWidget);
+    channelTable->setHorizontalHeaderLabels({"ID", "Capacity", "Price"});
+    channelTable->setMaximumSize(425, 600);
+
+    auto channelTableLabel = new QLabel("Channel Table");
+    channelTableLabel->setAlignment(Qt::AlignCenter);
+
+    auto addChannelTableButton = new QPushButton("Add");
+    QObject::connect(addChannelTableButton, &QPushButton::clicked, [this]() {
+        auto& table = this->channelTable;
+        auto row    = table->rowCount();
+
+        table->insertRow(row);
+        table->setItem(row, 0, new QTableWidgetItem(""));
+        table->setItem(row, 1, new QTableWidgetItem(""));
+        table->setItem(row, 2, new QTableWidgetItem(""));
+    });
+
+    auto removeChannelTableButton = new QPushButton("Remove");
+    QObject::connect(removeChannelTableButton, &QPushButton::clicked, [this]() {
+        auto& table        = this->channelTable;
+        auto selectedItems = table->selectedItems();
+
+        if (!selectedItems.isEmpty()) {
+            auto row = selectedItems.first()->row();
+            table->removeRow(row);
+        }
+    });
+
+    auto saveChannelTableButton = new QPushButton("Save");
+    QObject::connect(saveChannelTableButton, &QPushButton::clicked, [this]() {
+        this->saveChannelTable();
+    });
+
+    channelTableLayout->addWidget(channelTableLabel);
+    channelTableLayout->addWidget(channelTable);
+    channelTableLayout->addWidget(addChannelTableButton);
+    channelTableLayout->addWidget(removeChannelTableButton);
+    channelTableLayout->addWidget(saveChannelTableButton);
+    channelTableLayout->setAlignment(Qt::AlignTop);
+
+    return channelTableLayout;
+}
+
+void RouterSettings::setTablesLayout(void) noexcept
+{
+    tablesLayout = new QHBoxLayout(mainWidget);
+
+    setPacketSize();
+
+    tablesLayout->addLayout(setRouterTableLayout());
+    tablesLayout->addLayout(setChannelTableLayout());
+    tablesLayout->setAlignment(Qt::AlignTop);
+    mainLayout->addLayout(tablesLayout);
+}
+
+void RouterSettings::setPacketSize(void) noexcept
+{
+    auto layout = new QHBoxLayout();
+    auto label  = new QLabel("Packet size: ");
+
+    label->setMaximumWidth(100);
+    layout->addWidget(label);
+
+    // handle input
+    auto lineEdit = new QLineEdit();
+    lineEdit->setMaximumWidth(100);
+    layout->addWidget(lineEdit);
+
+    auto submitButton = new QPushButton("Submit");
+    submitButton->setMaximumWidth(100);
+    layout->addWidget(submitButton);
+
+    // connecting the button's clicked signal
+    QObject::connect(submitButton, &QPushButton::clicked, [lineEdit]() {
+        bool ok;
+        uint32_t packetSize = lineEdit->text().toUInt(&ok);
+
+        if (ok) {
+            projectContext.packetSize = packetSize;
+            std::println("[log] set packet size: {} KB", packetSize);
+        }
+        else
+            QMessageBox::warning(nullptr, "Input Error", "Please enter a valid number");
+    });
+
+    layout->setAlignment(Qt::AlignLeft);
+
+    mainLayout->addLayout(layout);
+    mainLayout->setAlignment(Qt::AlignTop);
+    mainWidget->setLayout(mainLayout);
+}
+
+// TODO: move to utils
+static inline QString getItem(const QTableWidget *table, size_t row, size_t column) noexcept
+{
+    auto item = table->item(
+        static_cast<int32_t>(row),
+        static_cast<int32_t>(column)
+    );
+
+    return item->text();
+}
+
+void RouterSettings::saveRouterTable(void) noexcept
+{
+    auto& routers = projectContext.routers;
+    routers.clear();
+
+    Router router;
+
+    for (int32_t i = 0; i < routerTable->rowCount(); i++) {
+        router.id       = getItem(routerTable, i, 0).toUInt();
+        router.model    = getItem(routerTable, i, 1).toStdString();
+        router.capacity = getItem(routerTable, i, 2).toUInt();
+        router.price    = getItem(routerTable, i, 3).toUInt();
+
+        routers.push_back(router);
+    }
+
+    // TODO: move to utils
+    for (const auto& router : routers) {
+        std::println("[log] routers: [ id: \'{}\', model: \'{}\', capacity: \'{}\', price: \'{}\' ]",
+            router.id, router.model, router.capacity, router.price
+        );
+    }
+}
+
+void RouterSettings::saveChannelTable(void) noexcept
+{
+    auto& channels = projectContext.channels;
+    channels.clear();
+
+    Channel channel;
+
+    for (int32_t i = 0; i < channelTable->rowCount(); i++) {
+        channel.id       = getItem(channelTable, i, 0).toUInt();
+        channel.capacity = getItem(channelTable, i, 1).toUInt();
+        channel.price    = getItem(channelTable, i, 2).toUInt();
+
+        channels.push_back(channel);
+    }
+
+    // TODO: move to utils
+    for (const auto& channel : channels) {
+        std::println("[log] channels: [ id: \'{}\', capacity: \'{}\', price: \'{}\' ]",
+            channel.id, channel.capacity, channel.price
+        );
+    }
+}
+
+} // namespace netd

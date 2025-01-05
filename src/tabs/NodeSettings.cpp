@@ -156,7 +156,7 @@ void NodeSettings::saveTables(void) noexcept
     Node node;
 
     for (int32_t i = 0; i < nodeTable->rowCount(); i++) {
-        node.id   = getItem(nodeTable, i, 0).toInt();
+        node.id   = getItem(nodeTable, i, 0).toUInt();
         node.name = getItem(nodeTable, i, 1).toStdString();
         node.x    = getItem(nodeTable, i, 2).toUInt();
         node.y    = getItem(nodeTable, i, 3).toUInt();

@@ -18,6 +18,7 @@ set(TABS_DIR        ${SRC_DIR}/tabs)
 
 # setting project source files
 set(SRCS
+    "${TABS_DIR}/RouterSettings.cpp"
     "${TABS_DIR}/NodeSettings.cpp"
     "${TABS_DIR}/SettingsTab.cpp"
     "${TABS_DIR}/GraphTab.cpp"
