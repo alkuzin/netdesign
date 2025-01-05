@@ -11,3 +11,4 @@ build/NetDesign
 *.csv
 *.txt
 *.ndproj
+*.xml
