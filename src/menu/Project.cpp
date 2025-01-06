@@ -18,6 +18,9 @@
 
 #include <NetDesign/ProjectContext.hpp>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QFileDialog>
 #include <NetDesign/Utils.hpp>
 #include <NetDesign/Menu.hpp>
 
@@ -25,14 +28,28 @@
 namespace netd {
 namespace menu {
 
+static QString createFile(void) noexcept;
+static QString openFile(void) noexcept;
+
 void onProjectNew(void) noexcept
 {
-    // TODO:
+    auto filename = createFile();
+
+    if (filename.isEmpty() || (projectContext.filename.compare(filename.toStdString()) == 0))
+        return;
+
+    projectContext.filename = std::move(filename.toStdString());
 }
 
 void onProjectOpen(void) noexcept
 {
-    // TODO:
+    auto filename = openFile();
+
+    if (filename.isEmpty())
+        return;
+
+    projectContext.filename = std::move(filename.toStdString());
+    convertToContext(projectContext.filename, projectContext);
 }
 
 void onProjectSave(void) noexcept
@@ -45,8 +62,68 @@ void onProjectSave(void) noexcept
 
 void onProjectExit(void) noexcept
 {
-    // TODO: ask if user sure to exit and ask him to save project
-    QApplication::quit();
+    QMessageBox::StandardButton reply;
+
+    reply = QMessageBox::question(
+        nullptr,
+        "Confirm Exit",
+        "Are you sure you want to exit?",
+        QMessageBox::Yes | QMessageBox::No
+    );
+
+    if (reply == QMessageBox::Yes)
+        QApplication::quit();
+}
+
+static QString createFile(void) noexcept
+{
+    bool ok;
+    QString filename = QInputDialog::getText(
+        nullptr,
+        "Create New Project",
+        "Project Name:",
+        QLineEdit::Normal,
+        "",
+        &ok
+    );
+
+    QFileInfo fileinfo(filename);
+
+    // append .xml, if there is no file extension
+    if (fileinfo.suffix().isEmpty())
+        filename += ".xml";
+
+    isExistRename(filename, "_new.xml");
+
+    if (ok && !filename.isEmpty()) {
+        QFile file(filename);
+
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QMessageBox::information(
+                nullptr,
+                "Project Created",
+                "Project created successfully: " + filename
+            );
+
+            file.close();
+        }
+        else
+            QMessageBox::warning(nullptr, "Error", "Could not create project file.");
+    }
+
+    return filename;
+}
+
+static QString openFile(void) noexcept
+{
+    QString filename = QFileDialog::getOpenFileName(
+        nullptr,
+        "Open File",
+        "",
+        "XML Files (*.xml);;All Files (*)"
+    );
+
+    return filename;
 }
 
 } // namespace menu
