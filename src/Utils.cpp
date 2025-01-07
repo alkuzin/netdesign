@@ -18,108 +18,137 @@
 
 #include <QtWidgets/QMessageBox>
 #include <NetDesign/Utils.hpp>
-#include <QtCore/QFile>
-#include <QtXml/QtXml>
 #include <filesystem>
+#include <fstream>
+#include <print>
 
 
 namespace netd {
 
-void convertToXML(const std::string_view& filename, const ProjectContext& context) noexcept
+void isExistRename(QString& filename, const std::string_view& suffix) noexcept
 {
-    // preventing overwriting of already existing project file
-    std::string target = filename.data();
-    auto path = std::filesystem::path(target);
+    auto target = filename.toStdString();
+    auto path   = std::filesystem::path(target);
 
     if (std::filesystem::exists(path)) {
         auto dotPosition = target.find_last_of('.');
 
         if (dotPosition != std::string::npos)
-            target = target.substr(0, dotPosition) + "_copy.xml";
+            filename = QString::fromStdString(target.substr(0, dotPosition) + suffix.data());
+    }
+}
+
+QString getItem(const QTableWidget *table, size_t row, size_t column) noexcept
+{
+    auto item = table->item(
+        static_cast<int32_t>(row),
+        static_cast<int32_t>(column)
+    );
+
+    return item->text();
+}
+
+void printProjectContext(void) noexcept
+{
+    const auto& context = projectContext;
+    std::println("Node Count: {}\nNodes:", context.nodes.size());
+
+    for (const auto& node : context.nodes) {
+        std::println("node: | id: {}, name: {}, x: {}, y: {} |",
+            node.id, node.name, node.x, node.y
+        );
     }
 
-    QFile file(target.c_str());
+    std::puts("\nLoad Matrix:");
+    for (size_t i = 0; i < context.loadMatrix.size1(); i++) {
+        std::putchar('|');
+        for (size_t j = 0; j < context.loadMatrix.size2(); j++)
+            std::print(" {:>3}", context.loadMatrix(i, j));
+        std::puts("   |");
+    }
+    std::putchar('\n');
 
-    if (!file.open(QIODevice::WriteOnly)) {
-        QMessageBox::warning(
-            nullptr,
-            "File Error",
-            "Error to open file: " + QString(target.c_str())
+    std::puts("\nRouter Table:");
+    for (const auto& router : context.routers) {
+        std::println("router: | id: {}, model: {}, capacity: {}, price: {} |",
+            router.id, router.model, router.capacity, router.price
         );
+    }
+
+    std::puts("\nChannel Table:");
+    for (const auto& channel : context.channels) {
+        std::println("channel: | id: {}, capacity: {}, price: {} |",
+            channel.id, channel.capacity, channel.price
+        );
+    }
+
+    std::println("\nPacket Size: {}", context.packetSize);
+}
+
+void saveProject(const std::string_view& filename) noexcept
+{
+    std::ofstream fout(filename.data(), std::ios::out);
+
+    if (!fout.is_open()) {
+        QMessageBox::warning(nullptr, "Error", "Could not create project file.");
         return;
     }
 
-    QXmlStreamWriter xmlWriter(&file);
-    xmlWriter.setAutoFormatting(true);
-    xmlWriter.writeStartDocument();
-    xmlWriter.writeStartElement("ProjectContext");
-
-    // saving loadMatrix
-    xmlWriter.writeStartElement("LoadMatrix");
-    for (size_t i = 0; i < context.loadMatrix.size1(); ++i) {
-        xmlWriter.writeStartElement("Row");
-        for (size_t j = 0; j < context.loadMatrix.size2(); ++j) {
-            xmlWriter.writeStartElement("Element");
-            xmlWriter.writeCharacters(QString::number(context.loadMatrix(i, j)));
-            xmlWriter.writeEndElement();
-        }
-        xmlWriter.writeEndElement();
-    }
-    xmlWriter.writeEndElement();
-
-    // saving channels
-    xmlWriter.writeStartElement("Channels");
-    for (const auto& channel : context.channels) {
-        xmlWriter.writeStartElement("Channel");
-        xmlWriter.writeAttribute("ID", QString::number(channel.id));
-        xmlWriter.writeTextElement("Capacity", QString::number(channel.capacity));
-        xmlWriter.writeTextElement("Price", QString::number(channel.price));
-        xmlWriter.writeEndElement();
-    }
-    xmlWriter.writeEndElement();
-
-    // saving routers
-    xmlWriter.writeStartElement("Routers");
-    for (const auto& router : context.routers) {
-        xmlWriter.writeStartElement("Router");
-        xmlWriter.writeAttribute("ID", QString::number(router.id));
-        xmlWriter.writeTextElement("Model", QString::fromStdString(router.model));
-        xmlWriter.writeTextElement("Capacity", QString::number(router.capacity));
-        xmlWriter.writeTextElement("Price", QString::number(router.price));
-        xmlWriter.writeEndElement();
-    }
-    xmlWriter.writeEndElement();
+    const auto& context = projectContext;
 
     // saving nodes
-    xmlWriter.writeStartElement("Nodes");
+    fout << "# Nodes\n";
+    fout << "count," << context.nodes.size() << "\n";
+    fout << "id,name,x,y\n";
+
     for (const auto& node : context.nodes) {
-        xmlWriter.writeStartElement("Node");
-        xmlWriter.writeAttribute("ID", QString::number(node.id));
-        xmlWriter.writeTextElement("Name", QString::fromStdString(node.name));
-        xmlWriter.writeTextElement("X", QString::number(node.x));
-        xmlWriter.writeTextElement("Y", QString::number(node.y));
-        xmlWriter.writeEndElement();
+        fout << node.id << ",";
+        fout << node.name << ",";
+        fout << node.x << ",";
+        fout << node.y << "\n";
     }
-    xmlWriter.writeEndElement();
+    fout << "\n";
 
-    // saving packet size
-    xmlWriter.writeTextElement("PacketSize", QString::number(context.packetSize));
-    xmlWriter.writeEndElement();
-    xmlWriter.writeEndDocument();
+    // saving load matrix
+    auto matrixCount = context.loadMatrix.size1();
 
-    QFileInfo fileInfo(file);
-    QMessageBox::information(
-        nullptr,
-        "Project",
-        "Project saved successfully at " + fileInfo.absoluteFilePath()
-    );
+    fout << "# Load Matrix\n";
+    fout << "count," << matrixCount << "\n";
 
-    file.close();
-}
+    for (std::size_t i = 0; i < matrixCount; i++) {
+        for (std::size_t j = 0; j < matrixCount; j++)
+            fout << context.loadMatrix(i, j) << ",";
+        fout << "\n";
+    }
+    fout << "\n";
 
-void convertToContext(const std::string_view& filename, ProjectContext& context) noexcept
-{
-    IGNORE_UNUSED(filename, context);
+    // saving routers
+    fout << "# Routers\n";
+    fout << "count," << context.routers.size() << "\n";
+    fout << "id,model,capacity,price\n";
+
+    for (const auto& router : context.routers) {
+        fout << router.id << ",";
+        fout << router.model << ",";
+        fout << router.capacity << ",";
+        fout << router.price << "\n";
+    }
+    fout << "\n";
+
+    // saving channels
+    fout << "# Channels\n";
+    fout << "count," << context.channels.size() << "\n";
+    fout << "id,capacity,price\n";
+
+    for (const auto& channel : context.channels) {
+        fout << channel.id << ",";
+        fout << channel.capacity << ",";
+        fout << channel.price << "\n";
+    }
+
+    fout << "\n# Packet Size\n";
+    fout << "size," << context.packetSize << "\n";
+    fout.close();
 }
 
 } // namespace netd

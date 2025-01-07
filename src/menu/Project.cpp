@@ -17,6 +17,7 @@
  */
 
 #include <NetDesign/ProjectContext.hpp>
+#include <NetDesign/ProjectParser.hpp>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QMessageBox>
@@ -49,7 +50,9 @@ void onProjectOpen(void) noexcept
         return;
 
     projectContext.filename = std::move(filename.toStdString());
-    convertToContext(projectContext.filename, projectContext);
+
+    ProjectParser parser;
+    parser.parse(projectContext.filename);
 }
 
 void onProjectSave(void) noexcept
@@ -57,7 +60,7 @@ void onProjectSave(void) noexcept
     if (projectContext.filename.empty())
         onProjectNew();
 
-    convertToXML(projectContext.filename, projectContext);
+    saveProject(projectContext.filename);
 }
 
 void onProjectExit(void) noexcept
@@ -89,11 +92,11 @@ static QString createFile(void) noexcept
 
     QFileInfo fileinfo(filename);
 
-    // append .xml, if there is no file extension
+    // append .ndproj, if there is no file extension
     if (fileinfo.suffix().isEmpty())
-        filename += ".xml";
+        filename += ".ndproj";
 
-    isExistRename(filename, "_new.xml");
+    isExistRename(filename, "_new.ndproj");
 
     if (ok && !filename.isEmpty()) {
         QFile file(filename);
@@ -120,7 +123,7 @@ static QString openFile(void) noexcept
         nullptr,
         "Open File",
         "",
-        "XML Files (*.xml);;All Files (*)"
+        "NetDesign Project Files (*.ndproj);;All Files (*)"
     );
 
     return filename;

@@ -20,7 +20,8 @@
 #define NET_DESIGN_UTILS_HPP
 
 #include <NetDesign/ProjectContext.hpp>
-#include <QtXml/QDomDocument>
+#include <QtWidgets/QTableWidget>
+#include <QtCore/QString>
 #include <string>
 
 
@@ -29,10 +30,13 @@ namespace netd {
 template<typename... Args>
 void IGNORE_UNUSED(Args&&...) { /* do nothing */ }
 
-void convertToXML(const std::string_view& filename, const ProjectContext& context) noexcept;
-void convertToContext(const std::string_view& filename, ProjectContext& context) noexcept;
+void saveProject(const std::string_view& filename) noexcept;
 
-// TODO: implement function that checks is value in specific range
+QString getItem(const QTableWidget *table, size_t row, size_t column) noexcept;
+
+void isExistRename(QString& filename, const std::string_view& suffix) noexcept;
+
+void printProjectContext(void) noexcept;
 
 } // namespace netd
 
