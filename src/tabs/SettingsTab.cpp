@@ -22,11 +22,6 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QMessageBox>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QHeaderView>
-#include <NetDesign/Utils.hpp>
-#include <print>
 
 
 namespace netd {
@@ -41,7 +36,7 @@ QTabWidget *setSettingsTab(void) noexcept
     settings.list       = new QListWidget(settings.tab);
     settings.content    = new QStackedWidget(settings.tab);
 
-    static NodeSettings nodeSettings(settings);
+    static NodeSettings   nodeSettings(settings);
     static RouterSettings routerSettings(settings);
 
     // connecting the list widget selection to change the stacked widget
@@ -58,7 +53,6 @@ QTabWidget *setSettingsTab(void) noexcept
     settings.list->setFont(font);
 
     settings.list->setMaximumWidth(550);
-
     settings.mainLayout->addWidget(settings.list);
     settings.mainLayout->addWidget(settings.content);
     settings.tab->setLayout(settings.mainLayout);

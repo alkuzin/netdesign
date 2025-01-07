@@ -21,8 +21,8 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QLineEdit>
+#include <NetDesign/Utils.hpp>
 #include <QtWidgets/QLabel>
-#include <print>
 
 
 namespace netd {
@@ -88,7 +88,6 @@ void NodeSettings::setNodeCount(void) noexcept
     });
 
     layout->setAlignment(Qt::AlignLeft);
-
     mainLayout->addLayout(layout);
     mainLayout->setAlignment(Qt::AlignTop);
     mainWidget->setLayout(mainLayout);
@@ -125,7 +124,6 @@ void NodeSettings::updateTables(void) noexcept
 
     auto& matrix = projectContext.loadMatrix;
     matrix.clear();
-
     matrix.resize(nodeCount, nodeCount, false);
 
     matrixTable->setRowCount(nodeCount);
@@ -135,17 +133,6 @@ void NodeSettings::updateTables(void) noexcept
         for (int32_t j = 0; j < nodeCount; j++)
             matrixTable->setItem(i, j, new QTableWidgetItem("0"));
     }
-}
-
-// TODO: move to utils
-static inline QString getItem(const QTableWidget *table, size_t row, size_t column) noexcept
-{
-    auto item = table->item(
-        static_cast<int32_t>(row),
-        static_cast<int32_t>(column)
-    );
-
-    return item->text();
 }
 
 void NodeSettings::saveTables(void) noexcept
@@ -164,29 +151,12 @@ void NodeSettings::saveTables(void) noexcept
         nodes.push_back(node);
     }
 
-    // TODO: move to utils
-    for (const auto& node : nodes) {
-        std::println("[log] nodes: [ id: \'{}\', name: \'{}\', x: \'{}\', y: \'{}\' ]",
-            node.id, node.name, node.x, node.y
-        );
-    }
-
     auto& matrix = projectContext.loadMatrix;
 
     for (size_t i = 0; i < matrix.size1(); i++) {
         for (size_t j = 0; j < matrix.size2(); j++)
             matrix(i, j) = getItem(matrixTable, i, j).toUInt();
     }
-
-    // TODO: move to utils
-    std::putchar('\n');
-    for (size_t i = 0; i < matrix.size1(); i++) {
-        std::putchar('|');
-        for (size_t j = 0; j < matrix.size2(); j++)
-            std::print(" {:>3}", matrix(i, j));
-        std::puts("   |");
-    }
-    std::putchar('\n');
 }
 
 } // namespace netd

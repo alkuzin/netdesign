@@ -23,8 +23,8 @@
 #include <NetDesign/Channel.hpp>
 #include <NetDesign/Router.hpp>
 #include <QtWidgets/QLineEdit>
+#include <NetDesign/Utils.hpp>
 #include <QtWidgets/QLabel>
-#include <print>
 
 
 namespace netd {
@@ -168,10 +168,8 @@ void RouterSettings::setPacketSize(void) noexcept
         bool ok;
         uint32_t packetSize = lineEdit->text().toUInt(&ok);
 
-        if (ok) {
+        if (ok)
             projectContext.packetSize = packetSize;
-            std::println("[log] set packet size: {} KB", packetSize);
-        }
         else
             QMessageBox::warning(nullptr, "Input Error", "Please enter a valid number");
     });
@@ -181,17 +179,6 @@ void RouterSettings::setPacketSize(void) noexcept
     mainLayout->addLayout(layout);
     mainLayout->setAlignment(Qt::AlignTop);
     mainWidget->setLayout(mainLayout);
-}
-
-// TODO: move to utils
-static inline QString getItem(const QTableWidget *table, size_t row, size_t column) noexcept
-{
-    auto item = table->item(
-        static_cast<int32_t>(row),
-        static_cast<int32_t>(column)
-    );
-
-    return item->text();
 }
 
 void RouterSettings::saveRouterTable(void) noexcept
@@ -209,13 +196,6 @@ void RouterSettings::saveRouterTable(void) noexcept
 
         routers.push_back(router);
     }
-
-    // TODO: move to utils
-    for (const auto& router : routers) {
-        std::println("[log] routers: [ id: \'{}\', model: \'{}\', capacity: \'{}\', price: \'{}\' ]",
-            router.id, router.model, router.capacity, router.price
-        );
-    }
 }
 
 void RouterSettings::saveChannelTable(void) noexcept
@@ -231,13 +211,6 @@ void RouterSettings::saveChannelTable(void) noexcept
         channel.price    = getItem(channelTable, i, 2).toUInt();
 
         channels.push_back(channel);
-    }
-
-    // TODO: move to utils
-    for (const auto& channel : channels) {
-        std::println("[log] channels: [ id: \'{}\', capacity: \'{}\', price: \'{}\' ]",
-            channel.id, channel.capacity, channel.price
-        );
     }
 }
 
