@@ -19,7 +19,6 @@
 #include <NetDesign/MainWindow.hpp>
 #include <NetDesign/Utils.hpp>
 #include <NetDesign/Menu.hpp>
-#include <NetDesign/Tabs.hpp>
 
 
 namespace netd {
@@ -37,8 +36,9 @@ MainWindow::MainWindow(void) noexcept
     setMinimumSize(WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT);
     setMaximumSize(WINDOW_MAX_WIDTH, WINDOW_MAX_HEIGHT);
 
-    m_menuBar   = menuBar();
-    m_tabWidget = new QTabWidget(this);
+    m_menuBar     = menuBar();
+    m_tabWidget   = new QTabWidget(this);
+    m_settingsTab = new tab::SettingsTab();
     setCentralWidget(m_tabWidget);
 
     initMenuBar();
@@ -81,8 +81,13 @@ void MainWindow::initMenuBar(void) noexcept
 
 void MainWindow::initTabs(void) noexcept
 {
-    m_tabWidget->addTab(tab::setSettingsTab(), "Settings");
+    m_tabWidget->addTab(m_settingsTab, "Settings");
     m_tabWidget->addTab(tab::setGraphTab(), "Graph");
+}
+
+void MainWindow::updateTabs(void) noexcept
+{
+    m_settingsTab->updateTabs();
 }
 
 } // namespace netd

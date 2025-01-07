@@ -31,7 +31,7 @@ netd::ProjectContext projectContext;
 int32_t main(int32_t argc, char **argv)
 {
     QApplication app(argc, argv);
-    netd::MainWindow window;
+    netd::MainWindow::getInstance()->show();
 
     return app.exec();
 }

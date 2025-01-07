@@ -21,20 +21,28 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
+#include <NetDesign/Tabs.hpp>
 
 
 namespace netd {
 
 class MainWindow : public QMainWindow {
-    QTabWidget *m_tabWidget;
-    QMenuBar   *m_menuBar;
+    QTabWidget       *m_tabWidget;
+    QMenuBar         *m_menuBar;
+    tab::SettingsTab *m_settingsTab;
 
     private:
+        MainWindow(void) noexcept;
         void initMenuBar(void) noexcept;
         void initTabs(void) noexcept;
 
     public:
-        MainWindow(void) noexcept;
+        static MainWindow *getInstance(void) noexcept {
+            static MainWindow instance;
+            return &instance;
+        }
+
+        void updateTabs(void) noexcept;
 };
 
 } // namespace netd
