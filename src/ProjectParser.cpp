@@ -18,6 +18,7 @@
 
 #include <NetDesign/ProjectContext.hpp>
 #include <NetDesign/ProjectParser.hpp>
+#include <NetDesign/MainWindow.hpp>
 #include <QtWidgets/QMessageBox>
 #include <NetDesign/Utils.hpp>
 #include <print>
@@ -61,8 +62,11 @@ void ProjectParser::parse(const std::string_view& filename) noexcept
             projectContext.packetSize = parseCount();
     }
 
+    projectContext.isSet = true;
     file.close();
+
     printProjectContext();
+    MainWindow::getInstance()->updateTabs();
 }
 
 std::uint32_t ProjectParser::parseCount(void) noexcept

@@ -19,6 +19,8 @@
 #ifndef NET_DESIGN_TABS_HPP
 #define NET_DESIGN_TABS_HPP
 
+#include <NetDesign/RouterSettings.hpp>
+#include <NetDesign/NodeSettings.hpp>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QListWidget>
@@ -28,14 +30,17 @@
 namespace netd {
 namespace tab {
 
-struct SettingsTab {
+struct SettingsTab : public QTabWidget {
     QHBoxLayout    *mainLayout;
     QStackedWidget *content;
     QListWidget    *list;
-    QTabWidget     *tab;
+    NodeSettings    nodeSettings;
+    RouterSettings  routerSettings;
+
+    SettingsTab(void) noexcept;
+    void updateTabs(void) noexcept;
 };
 
-QTabWidget *setSettingsTab(void) noexcept;
 QTabWidget *setGraphTab(void) noexcept;
 
 } // namespace tab

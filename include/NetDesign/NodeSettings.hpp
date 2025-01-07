@@ -19,9 +19,10 @@
 #ifndef NET_DESIGN_NODE_SETTINGS_HPP
 #define NET_DESIGN_NODE_SETTINGS_HPP
 
+#include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QVBoxLayout>
-#include <NetDesign/Tabs.hpp>
+#include <QtWidgets/QListWidget>
 
 
 namespace netd {
@@ -31,9 +32,12 @@ class NodeSettings {
     QVBoxLayout  *mainLayout;
     QTableWidget *nodeTable;
     QTableWidget *matrixTable;
+    QLineEdit    *lineEdit;
 
     public:
-        NodeSettings(tab::SettingsTab& settings) noexcept;
+        NodeSettings(void) noexcept = default;
+        void set(QListWidget *list, QStackedWidget *content) noexcept;
+        void update(void) noexcept;
 
     private:
         void setNodeCount(void) noexcept;

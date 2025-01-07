@@ -18,6 +18,7 @@
 
 #include <NetDesign/ProjectContext.hpp>
 #include <NetDesign/RouterSettings.hpp>
+#include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QMessageBox>
 #include <NetDesign/Channel.hpp>
@@ -25,18 +26,19 @@
 #include <QtWidgets/QLineEdit>
 #include <NetDesign/Utils.hpp>
 #include <QtWidgets/QLabel>
+#include <print>
 
 
 namespace netd {
 
-RouterSettings::RouterSettings(tab::SettingsTab& settings) noexcept
+void RouterSettings::set(QListWidget *list, QStackedWidget *content) noexcept
 {
-    settings.list->addItem("Routers & Channels");
+    list->addItem("Routers & Channels");
     mainWidget = new QWidget();
     mainLayout = new QVBoxLayout(mainWidget);
 
     setTablesLayout();
-    settings.content->addWidget(mainWidget);
+    content->addWidget(mainWidget);
 }
 
 QVBoxLayout *RouterSettings::setRouterTableLayout(void) noexcept
@@ -51,14 +53,7 @@ QVBoxLayout *RouterSettings::setRouterTableLayout(void) noexcept
 
     auto addRouterTableButton = new QPushButton("Add");
     QObject::connect(addRouterTableButton, &QPushButton::clicked, [this]() {
-        auto& table = this->routerTable;
-        auto row    = table->rowCount();
-
-        table->insertRow(row);
-        table->setItem(row, 0, new QTableWidgetItem(""));
-        table->setItem(row, 1, new QTableWidgetItem(""));
-        table->setItem(row, 2, new QTableWidgetItem(""));
-        table->setItem(row, 3, new QTableWidgetItem(""));
+        this->insertRouter();
     });
 
     auto removeRouterTableButton = new QPushButton("Remove");
@@ -99,13 +94,7 @@ QVBoxLayout *RouterSettings::setChannelTableLayout(void) noexcept
 
     auto addChannelTableButton = new QPushButton("Add");
     QObject::connect(addChannelTableButton, &QPushButton::clicked, [this]() {
-        auto& table = this->channelTable;
-        auto row    = table->rowCount();
-
-        table->insertRow(row);
-        table->setItem(row, 0, new QTableWidgetItem(""));
-        table->setItem(row, 1, new QTableWidgetItem(""));
-        table->setItem(row, 2, new QTableWidgetItem(""));
+        this->insertChannel();
     });
 
     auto removeChannelTableButton = new QPushButton("Remove");
@@ -155,7 +144,7 @@ void RouterSettings::setPacketSize(void) noexcept
     layout->addWidget(label);
 
     // handle input
-    auto lineEdit = new QLineEdit();
+    lineEdit = new QLineEdit();
     lineEdit->setMaximumWidth(100);
     layout->addWidget(lineEdit);
 
@@ -164,9 +153,9 @@ void RouterSettings::setPacketSize(void) noexcept
     layout->addWidget(submitButton);
 
     // connecting the button's clicked signal
-    QObject::connect(submitButton, &QPushButton::clicked, [lineEdit]() {
+    QObject::connect(submitButton, &QPushButton::clicked, [this]() {
         bool ok;
-        uint32_t packetSize = lineEdit->text().toUInt(&ok);
+        uint32_t packetSize = this->lineEdit->text().toUInt(&ok);
 
         if (ok)
             projectContext.packetSize = packetSize;
@@ -212,6 +201,63 @@ void RouterSettings::saveChannelTable(void) noexcept
 
         channels.push_back(channel);
     }
+}
+
+void RouterSettings::update(void) noexcept
+{
+    auto& routers     = projectContext.routers;
+    auto routerCount = static_cast<std::int32_t>(routers.size());
+
+    routerTable->setRowCount(routerCount);
+
+    Router *router = nullptr;
+
+    for (std::int32_t i = 0; i < routerCount; i++) {
+        router = &routers.at(i);
+        routerTable->setItem(i, 0, new QTableWidgetItem(QString::number(router->id)));
+        routerTable->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(router->model)));
+        routerTable->setItem(i, 2, new QTableWidgetItem(QString::number(router->capacity)));
+        routerTable->setItem(i, 3, new QTableWidgetItem(QString::number(router->price)));
+    }
+
+    auto& channels    = projectContext.channels;
+    auto channelCount = static_cast<std::int32_t>(channels.size());
+
+    channelTable->setRowCount(channelCount);
+
+    Channel *channel = nullptr;
+
+    for (std::int32_t i = 0; i < channelCount; i++) {
+        channel = &channels.at(i);
+        channelTable->setItem(i, 0, new QTableWidgetItem(QString::number(channel->id)));
+        channelTable->setItem(i, 1, new QTableWidgetItem(QString::number(channel->capacity)));
+        channelTable->setItem(i, 2, new QTableWidgetItem(QString::number(channel->price)));
+    }
+
+    lineEdit->setText(QString::number(projectContext.packetSize));
+}
+
+void RouterSettings::insertRouter(void) noexcept
+{
+    auto& table = this->routerTable;
+    auto row    = table->rowCount();
+
+    table->insertRow(row);
+    table->setItem(row, 0, new QTableWidgetItem(""));
+    table->setItem(row, 1, new QTableWidgetItem(""));
+    table->setItem(row, 2, new QTableWidgetItem(""));
+    table->setItem(row, 3, new QTableWidgetItem(""));
+}
+
+void RouterSettings::insertChannel(void) noexcept
+{
+    auto& table = this->channelTable;
+    auto row    = table->rowCount();
+
+    table->insertRow(row);
+    table->setItem(row, 0, new QTableWidgetItem(""));
+    table->setItem(row, 1, new QTableWidgetItem(""));
+    table->setItem(row, 2, new QTableWidgetItem(""));
 }
 
 } // namespace netd

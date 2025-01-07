@@ -22,42 +22,39 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QHBoxLayout>
+#include <NetDesign/Tabs.hpp>
 
 
 namespace netd {
 namespace tab {
 
-QTabWidget *setSettingsTab(void) noexcept
+SettingsTab::SettingsTab(void) noexcept
 {
-    static SettingsTab settings;
+    mainLayout = new QHBoxLayout(this);
+    list       = new QListWidget(this);
+    content    = new QStackedWidget(this);
 
-    settings.tab        = new QTabWidget();
-    settings.mainLayout = new QHBoxLayout(settings.tab);
-    settings.list       = new QListWidget(settings.tab);
-    settings.content    = new QStackedWidget(settings.tab);
-
-    static NodeSettings   nodeSettings(settings);
-    static RouterSettings routerSettings(settings);
+    nodeSettings.set(list, content);
+    routerSettings.set(list, content);
 
     // connecting the list widget selection to change the stacked widget
-    settings.tab->connect(
-        settings.list,
-        &QListWidget::currentRowChanged,
-        settings.content,
-        &QStackedWidget::setCurrentIndex
-    );
+    connect(list, &QListWidget::currentRowChanged, content, &QStackedWidget::setCurrentIndex);
 
     // changing font size of list widget entries
-    QFont font = settings.list->font();
+    QFont font = list->font();
     font.setPointSize(18);
-    settings.list->setFont(font);
+    list->setFont(font);
 
-    settings.list->setMaximumWidth(550);
-    settings.mainLayout->addWidget(settings.list);
-    settings.mainLayout->addWidget(settings.content);
-    settings.tab->setLayout(settings.mainLayout);
+    list->setMaximumWidth(550);
+    mainLayout->addWidget(list);
+    mainLayout->addWidget(content);
+    setLayout(mainLayout);
+}
 
-    return settings.tab;
+void SettingsTab::updateTabs(void) noexcept
+{
+    nodeSettings.update();
+    routerSettings.update();
 }
 
 } // namespace tab

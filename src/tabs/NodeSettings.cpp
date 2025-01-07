@@ -27,9 +27,9 @@
 
 namespace netd {
 
-NodeSettings::NodeSettings(tab::SettingsTab& settings) noexcept
+void NodeSettings::set(QListWidget *list, QStackedWidget *content) noexcept
 {
-    settings.list->addItem("Node & Load Matrix");
+    list->addItem("Node & Load Matrix");
 
     mainWidget        = new QWidget();
     mainLayout        = new QVBoxLayout(mainWidget);
@@ -54,7 +54,7 @@ NodeSettings::NodeSettings(tab::SettingsTab& settings) noexcept
     mainLayout->addLayout(tablesLayout);
 
     mainLayout->addWidget(saveButton);
-    settings.content->addWidget(mainWidget);
+    content->addWidget(mainWidget);
 }
 
 void NodeSettings::setNodeCount(void) noexcept
@@ -66,7 +66,7 @@ void NodeSettings::setNodeCount(void) noexcept
     layout->addWidget(label);
 
     // handle input
-    auto lineEdit = new QLineEdit();
+    lineEdit = new QLineEdit();
     lineEdit->setMaximumWidth(100);
     layout->addWidget(lineEdit);
 
@@ -75,9 +75,9 @@ void NodeSettings::setNodeCount(void) noexcept
     layout->addWidget(submitButton);
 
     // connecting the button's clicked signal
-    QObject::connect(submitButton, &QPushButton::clicked, [this, lineEdit]() {
+    QObject::connect(submitButton, &QPushButton::clicked, [this]() {
         bool ok;
-        uint32_t nodeCount = lineEdit->text().toUInt(&ok);
+        uint32_t nodeCount = this->lineEdit->text().toUInt(&ok);
 
         if (ok) {
             projectContext.nodes.resize(nodeCount);
@@ -157,6 +157,44 @@ void NodeSettings::saveTables(void) noexcept
         for (size_t j = 0; j < matrix.size2(); j++)
             matrix(i, j) = getItem(matrixTable, i, j).toUInt();
     }
+}
+
+void NodeSettings::update(void) noexcept
+{
+    auto& nodes      = projectContext.nodes;
+    auto nodeCount   = static_cast<std::int32_t>(nodes.size());
+    std::int32_t row = 0;
+
+    // clear all entries, but save headers
+    nodeTable->setRowCount(0);
+    matrixTable->setRowCount(0);
+
+    Node *node = nullptr;
+
+    for (std::int32_t i = 0; i < nodeCount; ++i) {
+        row = nodeTable->rowCount();
+        nodeTable->insertRow(row);
+
+        node = &nodes.at(i);
+
+        // creating table items and setting them in the table
+        nodeTable->setItem(row, 0, new QTableWidgetItem(QString::number(node->id)));
+        nodeTable->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(node->name)));
+        nodeTable->setItem(row, 2, new QTableWidgetItem(QString::number(node->x)));
+        nodeTable->setItem(row, 3, new QTableWidgetItem(QString::number(node->y)));
+    }
+
+    auto& matrix = projectContext.loadMatrix;
+
+    matrixTable->setRowCount(nodeCount);
+    matrixTable->setColumnCount(nodeCount);
+
+    for (int32_t i = 0; i < nodeCount; i++) {
+        for (int32_t j = 0; j < nodeCount; j++)
+            matrixTable->setItem(i, j, new QTableWidgetItem(QString::number(matrix(i, j))));
+    }
+
+    lineEdit->setText(QString::number(projectContext.nodes.size()));
 }
 
 } // namespace netd

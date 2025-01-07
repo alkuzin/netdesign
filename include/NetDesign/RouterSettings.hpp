@@ -19,9 +19,10 @@
 #ifndef NET_DESIGN_ROUTER_SETTINGS_HPP
 #define NET_DESIGN_ROUTER_SETTINGS_HPP
 
+#include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QTableWidget>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QVBoxLayout>
-#include <NetDesign/Tabs.hpp>
 
 
 namespace netd {
@@ -32,9 +33,12 @@ class RouterSettings {
     QHBoxLayout  *tablesLayout;
     QTableWidget *routerTable;
     QTableWidget *channelTable;
+    QLineEdit    *lineEdit;
 
     public:
-        RouterSettings(tab::SettingsTab& settings) noexcept;
+        RouterSettings(void) noexcept = default;
+        void set(QListWidget *list, QStackedWidget *content) noexcept;
+        void update(void) noexcept;
 
     private:
         void setTablesLayout(void) noexcept;
@@ -43,6 +47,8 @@ class RouterSettings {
         void setPacketSize(void) noexcept;
         void saveRouterTable(void) noexcept;
         void saveChannelTable(void) noexcept;
+        void insertRouter(void) noexcept;
+        void insertChannel(void) noexcept;
 };
 
 } // namespace netd

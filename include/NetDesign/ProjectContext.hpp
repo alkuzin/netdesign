@@ -31,12 +31,13 @@ namespace netd {
 namespace ublas = boost::numeric::ublas;
 
 struct ProjectContext {
-    ublas::matrix<uint32_t> loadMatrix;
-    std::vector<Channel>    channels;
-    std::vector<Router>     routers;
-    std::vector<Node>       nodes;
-    uint32_t                packetSize;
-    std::string             filename;
+    ublas::matrix<std::uint32_t> loadMatrix;
+    std::vector<Channel> channels;
+    std::vector<Router> routers;
+    std::vector<Node> nodes;
+    std::uint32_t packetSize;
+    std::string filename;
+    bool isSet;
 };
 
 extern ProjectContext projectContext;
