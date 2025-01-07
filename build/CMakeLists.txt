@@ -25,6 +25,7 @@ set(SRCS
     "${MENU_DIR}/Project.cpp"
     "${MENU_DIR}/Edit.cpp"
     "${MENU_DIR}/Info.cpp"
+    "${SRC_DIR}/ProjectParser.cpp"
     "${SRC_DIR}/MainWindow.cpp"
     "${SRC_DIR}/Utils.cpp"
     "${SRC_DIR}/Main.cpp"
