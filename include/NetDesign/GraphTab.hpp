@@ -16,37 +16,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_DESIGN_MAIN_WINDOW_HPP
-#define NET_DESIGN_MAIN_WINDOW_HPP
+#ifndef NET_DESIGN_GRAPH_TAB_HPP
+#define NET_DESIGN_GRAPH_TAB_HPP
 
-#include <NetDesign/SettingsTab.hpp>
-#include <NetDesign/GraphTab.hpp>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenuBar>
+#include <NetDesign/NetworkGraph.hpp>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QTabWidget>
 
 
 namespace netd {
+namespace tab {
 
-class MainWindow : public QMainWindow {
-    QTabWidget       *m_tabWidget;
-    QMenuBar         *m_menuBar;
-    tab::SettingsTab *m_settingsTab;
-    tab::GraphTab    *m_graphTab;
-
-    private:
-        MainWindow(void) noexcept;
-        void initMenuBar(void) noexcept;
-        void initTabs(void) noexcept;
+class GraphTab : public QTabWidget {
+    QGraphicsScene *m_scene;
+    QVBoxLayout    *m_buttonLayout;
+    QVBoxLayout    *m_graphLayout;
+    QHBoxLayout    *m_mainLayout;
+    NetworkGraph   m_graph;
 
     public:
-        static MainWindow *getInstance(void) noexcept {
-            static MainWindow instance;
-            return &instance;
-        }
-
+        GraphTab(void) noexcept;
         void updateTabs(void) noexcept;
+
+    private:
+        void setGraphLayout(void) noexcept;
+        void setButtonLayout(void) noexcept;
+        void drawNode(const Node& node) noexcept;
+        void clearGraph(void) noexcept;
 };
 
+} // namespace tab
 } // namespace netd
 
-#endif // NET_DESIGN_MAIN_WINDOW_HPP
+#endif // NET_DESIGN_GRAPH_TAB_HPP

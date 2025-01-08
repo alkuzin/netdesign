@@ -16,16 +16,89 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <NetDesign/Tabs.hpp>
+#include <QtWidgets/QGraphicsEllipseItem>
+#include <QtWidgets/QGraphicsView>
+#include <NetDesign/GraphTab.hpp>
+#include <print>
 
 
 namespace netd {
 namespace tab {
 
-QTabWidget *setGraphTab(void) noexcept
+constexpr auto NODE_RADIUS {16};
+
+GraphTab::GraphTab(void) noexcept
 {
-    QTabWidget *tab = new QTabWidget();
-    return tab;
+    m_mainLayout   = new QHBoxLayout(this);
+    m_graphLayout  = new QVBoxLayout(this);
+    m_buttonLayout = new QVBoxLayout(this);
+
+    setGraphLayout();
+    setButtonLayout();
+
+    m_mainLayout->addLayout(m_graphLayout);
+    m_mainLayout->addLayout(m_buttonLayout);
+    setLayout(m_mainLayout);
+}
+
+void GraphTab::updateTabs(void) noexcept
+{
+    m_graph.m_adjList.clear();
+    m_graph.set();
+
+    clearGraph();
+
+    for (const auto& vertex : boost::make_iterator_range(boost::vertices(m_graph.m_adjList))) {
+        std::println("Vertex ID: {}, Name: ", vertex, m_graph.m_adjList[vertex].name);
+        drawNode(m_graph.m_adjList[vertex]);
+    }
+
+    m_graph.dijkstra(0);
+}
+
+void GraphTab::setGraphLayout(void) noexcept
+{
+    // setup graphics scene
+    m_scene = new QGraphicsScene();
+    m_scene->setSceneRect(0, 0, 1024, 768);
+
+    auto view = new QGraphicsView(m_scene);
+
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setRenderHint(QPainter::Antialiasing);
+
+    // invert y-axis
+    QTransform transform;
+    transform.translate(0, m_scene->sceneRect().height());
+    transform.scale(1, -1);
+    view->setTransform(transform);
+
+    m_mainLayout->addWidget(view);
+}
+
+void GraphTab::drawNode(const Node& node) noexcept
+{
+    auto ellipse = new QGraphicsEllipseItem(
+        node.x - NODE_RADIUS,
+        node.y - NODE_RADIUS,
+        NODE_RADIUS << 1,
+        NODE_RADIUS << 1
+    );
+
+    ellipse->setBrush(Qt::blue);
+    ellipse->setPen(QPen(Qt::black));
+    m_scene->addItem(ellipse);
+}
+
+void GraphTab::clearGraph(void) noexcept
+{
+    m_scene->clear();
+}
+
+void GraphTab::setButtonLayout(void) noexcept
+{
+    // TODO:
 }
 
 } // namespace tab

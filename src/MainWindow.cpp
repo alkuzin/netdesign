@@ -39,6 +39,7 @@ MainWindow::MainWindow(void) noexcept
     m_menuBar     = menuBar();
     m_tabWidget   = new QTabWidget(this);
     m_settingsTab = new tab::SettingsTab();
+    m_graphTab    = new tab::GraphTab();
     setCentralWidget(m_tabWidget);
 
     initMenuBar();
@@ -82,12 +83,13 @@ void MainWindow::initMenuBar(void) noexcept
 void MainWindow::initTabs(void) noexcept
 {
     m_tabWidget->addTab(m_settingsTab, "Settings");
-    m_tabWidget->addTab(tab::setGraphTab(), "Graph");
+    m_tabWidget->addTab(m_graphTab, "Graph");
 }
 
 void MainWindow::updateTabs(void) noexcept
 {
     m_settingsTab->updateTabs();
+    m_graphTab->updateTabs();
 }
 
 } // namespace netd
