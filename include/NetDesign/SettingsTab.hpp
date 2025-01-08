@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_DESIGN_TABS_HPP
-#define NET_DESIGN_TABS_HPP
+#ifndef NET_DESIGN_SETTINGS_TAB_HPP
+#define NET_DESIGN_SETTINGS_TAB_HPP
 
 #include <NetDesign/RouterSettings.hpp>
 #include <NetDesign/NodeSettings.hpp>
@@ -41,9 +41,7 @@ struct SettingsTab : public QTabWidget {
     void updateTabs(void) noexcept;
 };
 
-QTabWidget *setGraphTab(void) noexcept;
-
 } // namespace tab
 } // namespace netd
 
-#endif // NET_DESIGN_TABS_HPP
+#endif // NET_DESIGN_SETTINGS_TAB_HPP

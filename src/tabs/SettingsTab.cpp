@@ -17,12 +17,7 @@
  */
 
 #include <NetDesign/ProjectContext.hpp>
-#include <NetDesign/RouterSettings.hpp>
-#include <NetDesign/NodeSettings.hpp>
-#include <QtWidgets/QStackedWidget>
-#include <QtWidgets/QListWidget>
-#include <QtWidgets/QHBoxLayout>
-#include <NetDesign/Tabs.hpp>
+#include <NetDesign/SettingsTab.hpp>
 
 
 namespace netd {
