@@ -19,6 +19,9 @@
 #include <QtWidgets/QGraphicsEllipseItem>
 #include <QtWidgets/QGraphicsView>
 #include <NetDesign/GraphTab.hpp>
+#include <QtWidgets/QPushButton>
+#include <NetDesign/Utils.hpp>
+#include <filesystem>
 #include <print>
 
 
@@ -30,8 +33,8 @@ constexpr auto NODE_RADIUS {16};
 GraphTab::GraphTab(void) noexcept
 {
     m_mainLayout   = new QHBoxLayout(this);
-    m_graphLayout  = new QVBoxLayout(this);
-    m_buttonLayout = new QVBoxLayout(this);
+    m_graphLayout  = new QVBoxLayout();
+    m_buttonLayout = new QVBoxLayout();
 
     setGraphLayout();
     setButtonLayout();
@@ -43,15 +46,25 @@ GraphTab::GraphTab(void) noexcept
 
 void GraphTab::updateTabs(void) noexcept
 {
+    printProjectContext();
     m_graph.m_adjList.clear();
     m_graph.set();
-
     clearGraph();
 
-    for (const auto& vertex : boost::make_iterator_range(boost::vertices(m_graph.m_adjList))) {
-        std::println("Vertex ID: {}, Name: ", vertex, m_graph.m_adjList[vertex].name);
-        drawNode(m_graph.m_adjList[vertex]);
+    std::size_t src {0}, dest {0};
+
+    // draw edges
+    for (const auto& edge : boost::make_iterator_range(boost::edges(m_graph.m_adjList))) {
+        src  = boost::source(edge, m_graph.m_adjList);
+        dest = boost::target(edge, m_graph.m_adjList);
+
+        const auto& channel = m_graph.m_adjList[edge];
+        drawEdge(m_graph.m_adjList[src], m_graph.m_adjList[dest], channel);
     }
+
+    // draw nodes
+    for (const auto& vertex : boost::make_iterator_range(boost::vertices(m_graph.m_adjList)))
+        drawNode(m_graph.m_adjList[vertex]);
 
     m_graph.dijkstra(0);
 }
@@ -79,16 +92,50 @@ void GraphTab::setGraphLayout(void) noexcept
 
 void GraphTab::drawNode(const Node& node) noexcept
 {
-    auto ellipse = new QGraphicsEllipseItem(
-        node.x - NODE_RADIUS,
-        node.y - NODE_RADIUS,
-        NODE_RADIUS << 1,
-        NODE_RADIUS << 1
+    auto currentPath    = std::filesystem::current_path();
+    auto routerIconPath = QString(currentPath.c_str()) + "/res/router64x64.png";
+
+    // loading the image
+    QPixmap pixmap(routerIconPath);
+
+    // rotate by 180 degrees
+    QTransform transform;
+    transform.rotate(180);
+    auto rotatedPixmap = pixmap.transformed(transform, Qt::SmoothTransformation);
+
+    auto rotatedPixmapItem = new QGraphicsPixmapItem(rotatedPixmap);
+    rotatedPixmapItem->setPos(node.x - (NODE_RADIUS), node.y - (NODE_RADIUS));
+
+    // setting the tooltip for the pixmap item
+    auto tip = QString("Node ID: %1\nName: %2\nPosition: (%3, %4)")
+        .arg(node.id).arg(QString::fromStdString(node.name)).arg(node.x).arg(node.y);
+    rotatedPixmapItem->setToolTip(tip);
+
+    // setting the tooltip style
+    setStyleSheet(
+        "QToolTip {"
+        "color: black;"
+        "background-color: white;"
+        "border: 2px solid black;"
+        "padding: 5px;"
+        "}"
     );
 
-    ellipse->setBrush(Qt::blue);
-    ellipse->setPen(QPen(Qt::black));
-    m_scene->addItem(ellipse);
+    m_scene->addItem(rotatedPixmapItem);
+}
+
+void GraphTab::drawEdge(const Node& src, const Node& dest, const Channel& channel) noexcept
+{
+    QLineF line(src.x, src.y, dest.x, dest.y);
+
+    auto lineItem = new QGraphicsLineItem(line);
+    lineItem->setPen(QPen(Qt::gray));
+
+    auto tip = QString("Channel ID: %1\nCapacity: %2\nPrice: %3")
+        .arg(channel.id).arg(channel.capacity).arg(channel.price);
+
+    lineItem->setToolTip(tip);
+    m_scene->addItem(lineItem);
 }
 
 void GraphTab::clearGraph(void) noexcept
@@ -98,7 +145,13 @@ void GraphTab::clearGraph(void) noexcept
 
 void GraphTab::setButtonLayout(void) noexcept
 {
-    // TODO:
+    auto updateButton = new QPushButton("Update");
+
+    QObject::connect(updateButton, &QPushButton::clicked, [this]() {
+        this->updateTabs();
+    });
+
+    m_buttonLayout->addWidget(updateButton);
 }
 
 } // namespace tab
