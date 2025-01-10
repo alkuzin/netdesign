@@ -152,6 +152,7 @@ void NodeSettings::saveTables(void) noexcept
     }
 
     auto& matrix = projectContext.loadMatrix;
+    matrix.clear();
 
     for (size_t i = 0; i < matrix.size1(); i++) {
         for (size_t j = 0; j < matrix.size2(); j++)
