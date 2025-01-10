@@ -18,10 +18,12 @@
 
 #include <QtWidgets/QGraphicsEllipseItem>
 #include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QRadioButton>
 #include <NetDesign/GraphTab.hpp>
 #include <QtWidgets/QPushButton>
 #include <NetDesign/Utils.hpp>
 #include <filesystem>
+#include <algorithm>
 #include <print>
 
 
@@ -32,9 +34,12 @@ constexpr auto NODE_RADIUS {16};
 
 GraphTab::GraphTab(void) noexcept
 {
-    m_mainLayout   = new QHBoxLayout(this);
-    m_graphLayout  = new QVBoxLayout();
-    m_buttonLayout = new QVBoxLayout();
+    m_mainLayout       = new QHBoxLayout(this);
+    m_graphLayout      = new QVBoxLayout();
+    m_buttonLayout     = new QVBoxLayout();
+    m_weight           = nullptr;
+    m_srcNodeComboBox  = new QComboBox();
+    m_destNodeComboBox = new QComboBox();
 
     setGraphLayout();
     setButtonLayout();
@@ -66,7 +71,64 @@ void GraphTab::updateTabs(void) noexcept
     for (const auto& vertex : boost::make_iterator_range(boost::vertices(m_graph.m_adjList)))
         drawNode(m_graph.m_adjList[vertex]);
 
-    m_graph.dijkstra(0);
+    std::uint32_t srcPos {0}, destPos {0};
+
+    srcPos  = static_cast<std::uint32_t>(m_srcNodeComboBox->currentIndex());
+    destPos = static_cast<std::uint32_t>(m_destNodeComboBox->currentIndex());
+
+    if (m_weight) {
+        auto [distances, predecessors] = m_graph.dijkstra(srcPos, m_weight);
+
+        // output the results
+        std::println("Distances from node {}:", src);
+
+        for (std::size_t i = 0; i < distances.size(); ++i)
+            std::println("To node {}: {}", i, distances[i]);
+
+        std::uint32_t totalPrice {0};
+        double totalDelay {0.0};
+
+        if (distances[destPos] == std::numeric_limits<std::int32_t>::max()) {
+            std::println("Destination {} is not reachable from source {}", destPos, srcPos);
+            // TODO: add warning message box
+        }
+
+        std::vector<std::size_t> path;
+        for (VertexDescriptor v = destPos; v != srcPos; v = predecessors[v]) {
+            path.push_back(v);
+            auto& channel = m_graph.m_adjList[boost::edge(predecessors[v], v, m_graph.m_adjList).first];
+            totalPrice += channel.price;
+            totalDelay += calculateDelay(channel.capacity, projectContext.loadMatrix(predecessors[v], v));
+        }
+        path.push_back(srcPos);
+
+        // reversing the path to get it from src to dest
+        std::reverse(path.begin(), path.end());
+
+        // output the path
+        std::println("Path from {} to {}: ", srcPos, destPos);
+        for (const auto& node : path)
+            std::print("{} ", node);
+        std::putchar('\n');
+
+        std::println("Total price: {}\nTotal delay: {}", totalPrice, totalDelay);
+
+        // TODO: count average delay
+        // TODO: count price of routers
+        m_delayLabel->setText("Delay: " + QString::number(totalDelay));
+        m_priceLabel->setText("Price: " + QString::number(totalPrice));
+    }
+
+    // fill comboboxes
+    m_srcNodeComboBox->clear();
+    m_destNodeComboBox->clear();
+
+    for (const auto& node : projectContext.nodes) {
+        auto str = QString::fromStdString(node.name);
+        m_srcNodeComboBox->addItem(str);
+        m_destNodeComboBox->addItem(str);
+    }
+
 }
 
 void GraphTab::setGraphLayout(void) noexcept
@@ -145,6 +207,33 @@ void GraphTab::clearGraph(void) noexcept
 
 void GraphTab::setButtonLayout(void) noexcept
 {
+    m_delayLabel = new QLabel("Delay: ");
+    m_priceLabel = new QLabel("Price: ");
+
+    m_buttonLayout->addWidget(m_delayLabel);
+    m_buttonLayout->addWidget(m_priceLabel);
+
+    // TODO: add combobox to select src and dest nodes for dijkstra()
+
+    auto priceRadioButton    = new QRadioButton("Price", this);
+    auto capacityRadioButton = new QRadioButton("Capacity", this);
+
+    connect(priceRadioButton, &QRadioButton::toggled, this, [this]() {
+        this->m_weight = &Channel::price;
+    });
+
+    connect(capacityRadioButton, &QRadioButton::toggled, this, [this]() {
+        this->m_weight = &Channel::capacity;
+    });
+
+    m_buttonLayout->addWidget(priceRadioButton);
+    m_buttonLayout->addWidget(capacityRadioButton);
+
+    m_buttonLayout->addWidget(m_srcNodeComboBox);
+    m_buttonLayout->addWidget(m_destNodeComboBox);
+    m_buttonLayout->setAlignment(Qt::AlignTop);
+
+    // adding Update button
     auto updateButton = new QPushButton("Update");
 
     QObject::connect(updateButton, &QPushButton::clicked, [this]() {

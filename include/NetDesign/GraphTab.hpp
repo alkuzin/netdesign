@@ -23,6 +23,8 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QLabel>
 
 
 namespace netd {
@@ -34,6 +36,11 @@ class GraphTab : public QTabWidget {
     QVBoxLayout    *m_graphLayout;
     QHBoxLayout    *m_mainLayout;
     NetworkGraph   m_graph;
+    std::uint32_t Channel::* m_weight;
+    QLabel        *m_delayLabel;
+    QLabel        *m_priceLabel;
+    QComboBox     *m_srcNodeComboBox;
+    QComboBox     *m_destNodeComboBox;
 
     public:
         GraphTab(void) noexcept;
@@ -43,6 +50,7 @@ class GraphTab : public QTabWidget {
         void setGraphLayout(void) noexcept;
         void setButtonLayout(void) noexcept;
         void drawNode(const Node& node) noexcept;
+        void drawEdge(const Node& src, const Node& dest, const Channel& channel) noexcept;
         void clearGraph(void) noexcept;
 };
 
