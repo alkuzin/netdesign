@@ -22,23 +22,31 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <NetDesign/Channel.hpp>
 #include <NetDesign/Node.hpp>
+#include <tuple>
 
 
 namespace netd {
 
+enum class WEIGHT {PRICE, CAPACITY};
+
 using Graph = boost::adjacency_list<
-    boost::vecS,
-    boost::vecS,
-    boost::undirectedS,
-    Node,
-    Channel
+    boost::vecS,        // vertex container
+    boost::vecS,        // edge container
+    boost::undirectedS, // directed/undirected
+    Node,               // vertex properties
+    Channel             // edge properties
 >;
+
+using VertexDescriptor = boost::graph_traits<Graph>::vertex_descriptor;
+
+using Distances         = std::vector<std::int32_t>;
+using VertexDescriptors = std::vector<VertexDescriptor>;
 
 class NetworkGraph {
     public:
         NetworkGraph(void) noexcept = default;
         void set(void) noexcept;
-        void dijkstra(std::uint32_t start) noexcept;
+        std::tuple<Distances, VertexDescriptors> dijkstra(std::uint32_t src, std::uint32_t Channel::* weight) noexcept;
 
         Graph m_adjList;
 };
