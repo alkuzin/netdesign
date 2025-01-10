@@ -38,6 +38,9 @@ class MainWindow : public QMainWindow {
         void initMenuBar(void) noexcept;
         void initTabs(void) noexcept;
 
+    protected:
+        void keyPressEvent(QKeyEvent *event) noexcept override;
+
     public:
         static MainWindow *getInstance(void) noexcept {
             static MainWindow instance;

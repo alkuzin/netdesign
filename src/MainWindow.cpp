@@ -19,6 +19,7 @@
 #include <NetDesign/MainWindow.hpp>
 #include <NetDesign/Utils.hpp>
 #include <NetDesign/Menu.hpp>
+#include <QtGui/QKeyEvent>
 
 
 namespace netd {
@@ -90,6 +91,25 @@ void MainWindow::updateTabs(void) noexcept
 {
     m_settingsTab->updateTabs();
     m_graphTab->updateTabs();
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event) noexcept
+{
+    if (event->key() == Qt::Key_Left) {
+        // navigate to the previous tab
+        std::int32_t cur   = m_tabWidget->currentIndex();
+        std::int32_t count = m_tabWidget->count();
+        std::int32_t prev  = (cur - 1 + count) % count;
+
+        m_tabWidget->setCurrentIndex(prev);
+    }
+    else if (event->key() == Qt::Key_Right) {
+        // navigate to the next tab
+        std::int32_t cur  = m_tabWidget->currentIndex();
+        std::int32_t next = (cur + 1) % m_tabWidget->count();
+
+        m_tabWidget->setCurrentIndex(next);
+    }
 }
 
 } // namespace netd
