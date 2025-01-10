@@ -25,10 +25,17 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLabel>
+#include <vector>
+#include <map>
 
 
 namespace netd {
 namespace tab {
+
+using EdgeItemMap = std::map<
+    boost::graph_traits<Graph>::edge_descriptor,
+    QGraphicsLineItem*
+>;
 
 class GraphTab : public QTabWidget {
     QGraphicsScene *m_scene;
@@ -41,6 +48,7 @@ class GraphTab : public QTabWidget {
     QLabel        *m_priceLabel;
     QComboBox     *m_srcNodeComboBox;
     QComboBox     *m_destNodeComboBox;
+    EdgeItemMap    m_edgeItems;
 
     public:
         GraphTab(void) noexcept;
@@ -52,6 +60,7 @@ class GraphTab : public QTabWidget {
         void drawNode(const Node& node) noexcept;
         void drawEdge(const Node& src, const Node& dest, const Channel& channel) noexcept;
         void clearGraph(void) noexcept;
+        void highlightPath(const std::vector<std::size_t>& path, const QColor& color) noexcept;
 };
 
 } // namespace tab

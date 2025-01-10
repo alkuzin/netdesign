@@ -54,6 +54,7 @@ void GraphTab::updateTabs(void) noexcept
     printProjectContext();
     m_graph.m_adjList.clear();
     m_graph.set();
+    m_edgeItems.clear();
     clearGraph();
 
     std::size_t src {0}, dest {0};
@@ -94,11 +95,17 @@ void GraphTab::updateTabs(void) noexcept
         }
 
         std::vector<std::size_t> path;
+
         for (VertexDescriptor v = destPos; v != srcPos; v = predecessors[v]) {
             path.push_back(v);
-            auto& channel = m_graph.m_adjList[boost::edge(predecessors[v], v, m_graph.m_adjList).first];
-            totalPrice += channel.price;
-            totalDelay += calculateDelay(channel.capacity, projectContext.loadMatrix(predecessors[v], v));
+
+            // Get the edge descriptor between predecessors[v] and v
+            auto edgePair = boost::edge(predecessors[v], v, m_graph.m_adjList);
+            if (edgePair.second) { // Check if the edge exists
+                auto& channel = m_graph.m_adjList[edgePair.first];
+                totalPrice += channel.price;
+                totalDelay += calculateDelay(channel.capacity, projectContext.loadMatrix(predecessors[v], v));
+            }
         }
         path.push_back(srcPos);
 
@@ -112,6 +119,7 @@ void GraphTab::updateTabs(void) noexcept
         std::putchar('\n');
 
         std::println("Total price: {}\nTotal delay: {}", totalPrice, totalDelay);
+        highlightPath(predecessors, Qt::red);
 
         // TODO: count average delay
         // TODO: count price of routers
@@ -198,6 +206,10 @@ void GraphTab::drawEdge(const Node& src, const Node& dest, const Channel& channe
 
     lineItem->setToolTip(tip);
     m_scene->addItem(lineItem);
+
+    // Store the edge descriptor and the corresponding QGraphicsLineItem
+    auto edge = boost::edge(src.id, dest.id, m_graph.m_adjList).first; // Assuming Node has an id
+    m_edgeItems[edge] = lineItem; // Store the line item
 }
 
 void GraphTab::clearGraph(void) noexcept
@@ -241,6 +253,22 @@ void GraphTab::setButtonLayout(void) noexcept
     });
 
     m_buttonLayout->addWidget(updateButton);
+}
+
+void GraphTab::highlightPath(const std::vector<std::size_t>& path, const QColor& color) noexcept
+{
+    for (std::size_t i = 0; i < path.size() - 1; ++i) {
+        auto src = path[i];
+        auto dest = path[i + 1];
+
+        auto edge = boost::edge(src, dest, m_graph.m_adjList).first;
+
+        // finding the corresponding QGraphicsLineItem and changing its color
+        auto it = m_edgeItems.find(edge);
+        if (it != m_edgeItems.end()) {
+            it->second->setPen(QPen(color));
+        }
+    }
 }
 
 } // namespace tab
