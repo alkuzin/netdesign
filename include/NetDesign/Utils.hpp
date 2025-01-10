@@ -30,6 +30,11 @@ namespace netd {
 template<typename... Args>
 void IGNORE_UNUSED(Args&&...) { /* do nothing */ }
 
+constexpr double calculateDelay(std::uint32_t capacity, std::uint32_t load) noexcept
+{
+    return std::pow((capacity - load), 0.5);
+}
+
 void saveProject(const std::string_view& filename) noexcept;
 
 QString getItem(const QTableWidget *table, size_t row, size_t column) noexcept;
