@@ -19,34 +19,24 @@
 #ifndef NET_DESIGN_MAIN_WINDOW_HPP
 #define NET_DESIGN_MAIN_WINDOW_HPP
 
-#include <NetDesign/SettingsTab.hpp>
-#include <NetDesign/GraphTab.hpp>
+#include <NetDesign/MenuController.hpp>
+#include <NetDesign/TabController.hpp>
+#include <NetDesign/TabView.hpp>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenuBar>
 
 
 namespace netd {
 
 class MainWindow : public QMainWindow {
-    QTabWidget       *m_tabWidget;
-    QMenuBar         *m_menuBar;
-    tab::SettingsTab *m_settingsTab;
-    tab::GraphTab    *m_graphTab;
-
-    private:
-        MainWindow(void) noexcept;
-        void initMenuBar(void) noexcept;
-        void initTabs(void) noexcept;
-
-    protected:
-        void keyPressEvent(QKeyEvent *event) noexcept override;
+    MenuController *m_menuController;
+    TabController  *m_tabController;
+    MenuView       *m_menuView;
+    TabView        *m_tabView;
 
     public:
-        static MainWindow *getInstance(void) noexcept {
-            static MainWindow instance;
-            return &instance;
-        }
+        MainWindow(void) noexcept;
 
+        // TODO: make static
         void updateTabs(void) noexcept;
 };
 
