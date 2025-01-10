@@ -21,6 +21,17 @@
 
 namespace netd {
 
+MenuController::MenuController(MenuView *menuView, QWidget *parent) noexcept
+{
+    auto actions = menuView->getActions();
+
+    parent->connect(actions[0], &QAction::triggered, this, &MenuController::onProjectNew);
+    parent->connect(actions[1], &QAction::triggered, this, &MenuController::onProjectOpen);
+    parent->connect(actions[2], &QAction::triggered, this, &MenuController::onProjectSave);
+    parent->connect(actions[3], &QAction::triggered, this, &MenuController::onProjectExit);
+    parent->connect(actions[4], &QAction::triggered, this, &MenuController::onInfoDocs);
+    parent->connect(actions[5], &QAction::triggered, this, &MenuController::onInfoAbout);
+}
 
 void MenuController::onProjectNew(void) noexcept
 {

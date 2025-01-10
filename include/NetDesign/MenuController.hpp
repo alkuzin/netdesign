@@ -21,17 +21,19 @@
 
 #include <NetDesign/ProjectController.hpp>
 #include <NetDesign/InfoController.hpp>
+#include <NetDesign/MenuView.hpp>
 
 
 namespace netd {
 
-class MenuController
+class MenuController : public QObject
 {
     ProjectController m_projectController;
     InfoController    m_infoController;
 
     public:
         MenuController(void) noexcept = default;
+        MenuController(MenuView *menuView, QWidget *parent = nullptr) noexcept;
 
         /** @brief "Project" New action handler.*/
         void onProjectNew(void) noexcept;
