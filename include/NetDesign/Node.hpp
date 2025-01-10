@@ -26,10 +26,10 @@
 namespace netd {
 
 struct Node {
-    std::string name;
-    uint32_t    id;
-    uint32_t    x;
-    uint32_t    y;
+    std::string   m_name;
+    std::uint32_t m_id;
+    std::uint32_t m_x;
+    std::uint32_t m_y;
 };
 
 } // namespace netd

@@ -26,10 +26,10 @@
 namespace netd {
 
 struct Router {
-    std::string model;
-    uint32_t    capacity;
-    uint32_t    price;
-    uint32_t    id;
+    std::string   m_model;
+    std::uint32_t m_capacity;
+    std::uint32_t m_price;
+    std::uint32_t m_id;
 };
 
 } // namespace netd

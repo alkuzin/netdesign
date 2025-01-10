@@ -28,19 +28,26 @@
 
 namespace netd {
 
-namespace ublas = boost::numeric::ublas;
+namespace ublas  = boost::numeric::ublas;
+using LoadMatrix = ublas::matrix<std::uint32_t>;
 
-struct ProjectContext {
-    ublas::matrix<std::uint32_t> loadMatrix;
-    std::vector<Channel> channels;
-    std::vector<Router> routers;
-    std::vector<Node> nodes;
-    std::uint32_t packetSize;
-    std::string filename;
-    bool isSet;
+class ProjectContext {
+    private:
+        ProjectContext(void) noexcept = default;
+
+    public:
+        std::vector<Channel>  m_channels;
+        std::vector<Router>   m_routers;
+        std::vector<Node>     m_nodes;
+        std::uint32_t         m_packetSize;
+        std::string           m_filename;
+        LoadMatrix            m_loadMatrix;
+
+        static ProjectContext& instance(void) noexcept {
+            static ProjectContext instance;
+            return instance;
+        }
 };
-
-extern ProjectContext projectContext;
 
 } // namespace netd
 
