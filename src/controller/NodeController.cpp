@@ -45,6 +45,7 @@ void NodeController::saveNodeCount(void) noexcept
     if (ok) {
         ProjectContext::instance().m_nodes.resize(nodeCount);
         this->setTables();
+        QMessageBox::information(nullptr, "Success", "Successfully saved node count");
     }
     else
         QMessageBox::warning(nullptr, "Input Error", "Please enter a valid number");
@@ -76,6 +77,8 @@ void NodeController::saveTables(void) noexcept
         for (std::size_t j = 0; j < matrix.size2(); j++)
             matrix(i, j) = getItem(m_nodeView->m_matrixTable, i, j).toUInt();
     }
+
+    QMessageBox::information(nullptr, "Success", "Successfully saved node & matrix tables");
 }
 
 void NodeController::setTables(void) noexcept
