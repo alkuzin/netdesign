@@ -44,7 +44,7 @@ void NodeController::saveNodeCount(void) noexcept
 
     if (ok) {
         ProjectContext::instance().m_nodes.resize(nodeCount);
-        this->updateTables();
+        this->setTables();
     }
     else
         QMessageBox::warning(nullptr, "Input Error", "Please enter a valid number");
@@ -78,12 +78,11 @@ void NodeController::saveTables(void) noexcept
     }
 }
 
-void NodeController::updateTables(void) noexcept
+void NodeController::setTables(void) noexcept
 {
     auto& nodes      = ProjectContext::instance().m_nodes;
     auto nodeCount   = static_cast<std::int32_t>(nodes.size());
     auto nodeTable   = m_nodeView->m_nodeTable;
-    auto matrixTable = m_nodeView->m_matrixTable;
 
     // preventing unintentional table update
     if (nodeTable->rowCount() == nodeCount)
@@ -92,7 +91,7 @@ void NodeController::updateTables(void) noexcept
     // clear all entries, but save headers
     nodeTable->setRowCount(0);
 
-    // update node table
+    // set node table
     std::int32_t row {0};
 
     for (std::int32_t i = 0; i < nodeCount; ++i) {
@@ -110,6 +109,49 @@ void NodeController::updateTables(void) noexcept
         return;
 
     // clear all entries, but save headers
+    auto matrixTable = m_nodeView->m_matrixTable;
+    matrixTable->setRowCount(0);
+
+    auto& matrix = ProjectContext::instance().m_loadMatrix;
+    matrix.clear();
+    matrix.resize(nodeCount, nodeCount, false);
+
+    // set load matrix table
+    matrixTable->setRowCount(nodeCount);
+    matrixTable->setColumnCount(nodeCount);
+
+    for (std::int32_t i = 0; i < nodeCount; i++) {
+        for (std::int32_t j = 0; j < nodeCount; j++)
+            matrixTable->setItem(i, j, new QTableWidgetItem("0"));
+    }
+}
+
+void NodeController::updateContent(void) noexcept
+{
+    auto& nodes      = ProjectContext::instance().m_nodes;
+    auto nodeCount   = static_cast<std::int32_t>(nodes.size());
+    auto nodeTable   = m_nodeView->m_nodeTable;
+
+    // clear all entries, but save headers
+    nodeTable->setRowCount(0);
+
+    // update node table
+    std::int32_t row {0};
+    Node *node {nullptr};
+
+    for (std::int32_t i = 0; i < nodeCount; ++i) {
+        node = &nodes.at(i);
+        row  = nodeTable->rowCount();
+        nodeTable->insertRow(row);
+
+        nodeTable->setItem(row, 0, new QTableWidgetItem(QString::number(node->m_id)));
+        nodeTable->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(node->m_name)));
+        nodeTable->setItem(row, 2, new QTableWidgetItem(QString::number(node->m_x)));
+        nodeTable->setItem(row, 3, new QTableWidgetItem(QString::number(node->m_y)));
+    }
+
+    // clear all entries, but save headers
+    auto matrixTable = m_nodeView->m_matrixTable;
     matrixTable->setRowCount(0);
 
     auto& matrix = ProjectContext::instance().m_loadMatrix;
@@ -122,8 +164,10 @@ void NodeController::updateTables(void) noexcept
 
     for (std::int32_t i = 0; i < nodeCount; i++) {
         for (std::int32_t j = 0; j < nodeCount; j++)
-            matrixTable->setItem(i, j, new QTableWidgetItem("0"));
+            matrixTable->setItem(i, j, new QTableWidgetItem(QString::number(matrix(i, j))));
     }
+
+    m_nodeView->m_lineEdit->setText(QString::number(nodes.size()));
 }
 
 } // namespace netd

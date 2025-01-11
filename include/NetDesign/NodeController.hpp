@@ -30,11 +30,12 @@ class NodeController : public QObject
 
     public:
         NodeController(NodeView *nodeView) noexcept;
+        void updateContent(void) noexcept;
 
     private:
         void saveNodeCount(void) noexcept;
         void saveTables(void) noexcept;
-        void updateTables(void) noexcept;
+        void setTables(void) noexcept;
 };
 
 } // namespace netd
