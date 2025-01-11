@@ -16,10 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <NetDesign/MenuController.hpp>
 #include <NetDesign/MainWindow.hpp>
-// #include <NetDesign/Utils.hpp>
-#include <QtGui/QKeyEvent>
 
 
 namespace netd {
@@ -29,7 +26,6 @@ constexpr auto WINDOW_MIN_WIDTH     {1024};
 constexpr auto WINDOW_MIN_HEIGHT    {768};
 constexpr auto WINDOW_MAX_WIDTH     {1920};
 constexpr auto WINDOW_MAX_HEIGHT    {1080};
-
 
 MainWindow::MainWindow(void) noexcept
 {
@@ -45,16 +41,7 @@ MainWindow::MainWindow(void) noexcept
 
     // set tabs
     m_tabView       = new TabView(this);
-    m_tabController = new TabController(m_tabView);
-
-    m_tabController->addTab(new QTabWidget(), "Settings");
-    m_tabController->addTab(new QTabWidget(), "Graph");
-
-    // TODO:
-    // m_settingsTab = new tab::SettingsTab();
-    // m_graphTab    = new tab::GraphTab();
-    // m_tabController->addTab(m_settingTab, "Settings");
-    // m_tabController->addTab(m_graphTab, "Graph");
+    m_tabController = new TabController(m_tabView, this);
 
     setCentralWidget(m_tabView->getTabWidget());
 }

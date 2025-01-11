@@ -1,45 +1,49 @@
 cmake_minimum_required(VERSION 3.10.0)
 
-# setting project name
+# set project name
 set(PROJECT_NAME NetDesign)
 project(${PROJECT_NAME})
 
-set(CMAKE_CXX_STANDARD 23)          # using C++23 standard
-set(CMAKE_CXX_STANDARD_REQUIRED ON) # enforcing the standard
-set(CMAKE_CXX_EXTENSIONS OFF)       # disabling compiler-specific extensions
+set(CMAKE_CXX_STANDARD 23)          # use C++23 standard
+set(CMAKE_CXX_STANDARD_REQUIRED ON) # enforce the standard
+set(CMAKE_CXX_EXTENSIONS OFF)       # disable compiler-specific extensions
 
-cmake_policy(SET CMP0167 NEW)       # setting the policy to suppress the warning
+cmake_policy(SET CMP0167 NEW)       # set the policy to suppress the warning
 
-# setting project paths
+# set project paths
 set(INCLUDE_DIR     ${CMAKE_SOURCE_DIR}/../include)
 set(SRC_DIR         ${CMAKE_SOURCE_DIR}/../src)
-set(MENU_DIR        ${SRC_DIR}/menu)
-set(TABS_DIR        ${SRC_DIR}/tabs)
+set(MODEL_DIR       ${SRC_DIR}/model)
+set(VIEW_DIR        ${SRC_DIR}/view)
+set(CONTROLLER_DIR  ${SRC_DIR}/controller)
+set(UTILS_DIR       ${SRC_DIR}/utils)
 
-# setting project source files
+# set project source files
 set(SRCS
-    "${TABS_DIR}/RouterSettings.cpp"
-    "${TABS_DIR}/NodeSettings.cpp"
-    "${TABS_DIR}/SettingsTab.cpp"
-    "${TABS_DIR}/GraphTab.cpp"
-    "${MENU_DIR}/Project.cpp"
-    "${MENU_DIR}/Edit.cpp"
-    "${MENU_DIR}/Info.cpp"
-    "${SRC_DIR}/ProjectParser.cpp"
-    "${SRC_DIR}/NetworkGraph.cpp"
-    "${SRC_DIR}/MainWindow.cpp"
-    "${SRC_DIR}/Utils.cpp"
+    "${CONTROLLER_DIR}/ProjectController.cpp"
+    "${CONTROLLER_DIR}/RouterController.cpp"
+    "${CONTROLLER_DIR}/NodeController.cpp"
+    "${CONTROLLER_DIR}/MenuController.cpp"
+    "${CONTROLLER_DIR}/InfoController.cpp"
+    "${CONTROLLER_DIR}/TabController.cpp"
+    "${VIEW_DIR}/SettingsView.cpp"
+    "${VIEW_DIR}/RouterView.cpp"
+    "${VIEW_DIR}/MenuView.cpp"
+    "${VIEW_DIR}/NodeView.cpp"
+    "${VIEW_DIR}/TabView.cpp"
+    "${VIEW_DIR}/MainWindow.cpp"
+    "${UTILS_DIR}/Utils.cpp"
     "${SRC_DIR}/Main.cpp"
 )
 
-# setting include directories
+# set include directories
 include_directories(${INCLUDE_DIR})
 
-# connecting Qt & Boost libraries
+# connect Qt & Boost libraries
 find_package(Qt6 REQUIRED COMPONENTS Widgets Charts Core Xml)
 find_package(Boost REQUIRED COMPONENTS system filesystem)
 
-# creating the executable
+# create the executable
 add_executable(${PROJECT_NAME} ${SRCS})
 
 set(CXXFLAGS
@@ -53,9 +57,9 @@ set(CXXFLAGS
     "-g"            # generate debug information
 )
 
-# setting compiler flags
+# set compiler flags
 target_compile_options(${PROJECT_NAME} PRIVATE ${CXXFLAGS})
 
-# linking the Qt & Boost libraries to the executable
+# link the Qt & Boost libraries to the executable
 target_link_libraries(${PROJECT_NAME} Qt6::Widgets Qt6::Charts Qt6::Core Qt6::Xml)
 target_link_libraries(${PROJECT_NAME} Boost::system Boost::filesystem)

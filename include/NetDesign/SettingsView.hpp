@@ -19,18 +19,33 @@
 #ifndef NET_DESIGN_SETTINGS_VIEW_HPP
 #define NET_DESIGN_SETTINGS_VIEW_HPP
 
+#include <NetDesign/RouterController.hpp>
+#include <NetDesign/NodeController.hpp>
+#include <QtWidgets/QStackedWidget>
+#include <NetDesign/RouterView.hpp>
+#include <NetDesign/NodeView.hpp>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QTabWidget>
 
 
 namespace netd {
 
-class SettingsView
+class SettingsView : public QObject
 {
-    QWidget *m_tab;
+    private:
+        RouterController *m_routerController;
+        NodeController   *m_nodeController;
+        RouterView       *m_routerView;
+        NodeView         *m_nodeView;
+        QHBoxLayout      *m_mainLayout;
+        QStackedWidget   *m_content;
+        QListWidget      *m_list;
 
     public:
+        QWidget *m_tab;
+
         SettingsView(QWidget *parent = nullptr) noexcept;
-        QWidget *getTab(void) noexcept;
 };
 
 } // namespace netd

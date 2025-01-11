@@ -19,11 +19,9 @@
 #ifndef NET_DESIGN_NODE_VIEW_HPP
 #define NET_DESIGN_NODE_VIEW_HPP
 
-#include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QListWidget>
 #include <QtWidgets/QLineEdit>
 
 

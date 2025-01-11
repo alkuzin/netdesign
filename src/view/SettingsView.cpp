@@ -23,12 +23,37 @@ namespace netd {
 
 SettingsView::SettingsView(QWidget *parent) noexcept
 {
-    m_tab = new QWidget(parent);
-}
+    m_content    = new QStackedWidget(parent);
+    m_mainLayout = new QHBoxLayout();
+    m_list       = new QListWidget(parent);
+    m_tab        = new QWidget(parent);
 
-QWidget *SettingsView::getTab(void) noexcept
-{
-    return m_tab;
+    // add node tab
+    m_nodeView         = new NodeView(parent);
+    m_nodeController   = new NodeController(m_nodeView);
+
+    m_list->addItem("Node & Load Matrix");
+    m_content->addWidget(m_nodeView->m_mainWidget);
+
+    // add router tab
+    m_routerView       = new RouterView(parent);
+    m_routerController = new RouterController(m_routerView);
+
+    m_list->addItem("Routers & Channels");
+    m_content->addWidget(m_routerView->m_mainWidget);
+
+    // connect the list widget selection to change the stacked widget
+    connect(m_list, &QListWidget::currentRowChanged, m_content, &QStackedWidget::setCurrentIndex);
+
+    // change font size of list widget entries
+    QFont font = m_list->font();
+    font.setPointSize(18);
+    m_list->setFont(font);
+    m_list->setMaximumWidth(550);
+
+    m_mainLayout->addWidget(m_list);
+    m_mainLayout->addWidget(m_content);
+    m_tab->setLayout(m_mainLayout);
 }
 
 } // namespace netd

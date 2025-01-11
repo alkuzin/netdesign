@@ -26,7 +26,7 @@ TabController::TabController(TabView *tabView, QWidget *parent) noexcept
     m_tabView      = tabView;
     m_settingsView = new SettingsView(parent);
 
-    addTab(m_settingsView->getTab(), "Settings");
+    addTab(m_settingsView->m_tab, "Settings");
 }
 
 void TabController::addTab(QWidget *tab, const QString& title) noexcept

@@ -16,22 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <NetDesign/ProjectContext.hpp>
 #include <NetDesign/MainWindow.hpp>
 #include <QtWidgets/QApplication>
 #include <cstdint>
 
 
-namespace netd {
-
-netd::ProjectContext projectContext;
-
-} // namespace netd
-
-int32_t main(int32_t argc, char **argv)
+std::int32_t main(std::int32_t argc, char **argv)
 {
     QApplication app(argc, argv);
-    netd::MainWindow::getInstance()->show();
+
+    auto window = new netd::MainWindow();
+    window->show();
 
     return app.exec();
 }
