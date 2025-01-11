@@ -16,19 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_DESIGN_UTILS_HPP
-#define NET_DESIGN_UTILS_HPP
-
-#include <QtWidgets/QTableWidget>
+#include <NetDesign/Utils.hpp>
 
 
 namespace netd {
 
-template<typename... Args>
-void IGNORE_UNUSED(Args&&...) {}
+QString getItem(const QTableWidget *table, std::size_t row, std::size_t column) noexcept
+{
+    auto item = table->item(
+        static_cast<std::int32_t>(row),
+        static_cast<std::int32_t>(column)
+    );
 
-QString getItem(const QTableWidget *table, std::size_t row, std::size_t column) noexcept;
+    return item->text();
+}
 
 } // namespace netd
-
-#endif // NET_DESIGN_UTILS_HPP
