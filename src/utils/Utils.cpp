@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <NetDesign/ProjectContext.hpp>
 #include <NetDesign/Utils.hpp>
+#include <print>
 
 
 namespace netd {
@@ -29,6 +31,43 @@ QString getItem(const QTableWidget *table, std::size_t row, std::size_t column) 
     );
 
     return item->text();
+}
+
+void printProjectContext(void) noexcept
+{
+    const auto& context = ProjectContext::instance();
+    std::println("Node Count: {}\nNodes:", context.m_nodes.size());
+
+    for (const auto& node : context.m_nodes) {
+        std::println("node: | id: {}, name: {}, x: {}, y: {} |",
+            node.m_id, node.m_name, node.m_x, node.m_y
+        );
+    }
+
+    std::puts("\nLoad Matrix:");
+    for (size_t i = 0; i < context.m_loadMatrix.size1(); i++) {
+        std::putchar('|');
+        for (size_t j = 0; j < context.m_loadMatrix.size2(); j++)
+            std::print(" {:>3}", context.m_loadMatrix(i, j));
+        std::puts("   |");
+    }
+    std::putchar('\n');
+
+    std::puts("\nRouter Table:");
+    for (const auto& router : context.m_routers) {
+        std::println("router: | id: {}, model: {}, capacity: {}, price: {} |",
+            router.m_id, router.m_model, router.m_capacity, router.m_price
+        );
+    }
+
+    std::puts("\nChannel Table:");
+    for (const auto& channel : context.m_channels) {
+        std::println("channel: | id: {}, capacity: {}, price: {} |",
+            channel.m_id, channel.m_capacity, channel.m_price
+        );
+    }
+
+    std::println("\nPacket Size: {}", context.m_packetSize);
 }
 
 } // namespace netd

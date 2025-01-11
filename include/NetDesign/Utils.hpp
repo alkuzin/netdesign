@@ -29,6 +29,8 @@ void IGNORE_UNUSED(Args&&...) {}
 
 QString getItem(const QTableWidget *table, std::size_t row, std::size_t column) noexcept;
 
+void printProjectContext(void) noexcept;
+
 } // namespace netd
 
 #endif // NET_DESIGN_UTILS_HPP
