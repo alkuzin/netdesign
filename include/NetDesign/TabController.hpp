@@ -19,6 +19,7 @@
 #ifndef NET_DESIGN_TAB_CONTROLLER_HPP
 #define NET_DESIGN_TAB_CONTROLLER_HPP
 
+#include <NetDesign/SettingsView.hpp>
 #include <NetDesign/TabView.hpp>
 
 
@@ -26,10 +27,11 @@ namespace netd {
 
 class TabController
 {
-    TabView *m_tabView;
+    SettingsView *m_settingsView;
+    TabView      *m_tabView;
 
     public:
-        TabController(TabView *tabView) noexcept : m_tabView(tabView) {};
+        TabController(TabView *tabView, QWidget *parent = nullptr) noexcept;
         void addTab(QWidget *tab, const QString& title) noexcept;
 };
 

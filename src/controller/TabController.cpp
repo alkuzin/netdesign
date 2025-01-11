@@ -21,6 +21,14 @@
 
 namespace netd {
 
+TabController::TabController(TabView *tabView, QWidget *parent) noexcept
+{
+    m_tabView      = tabView;
+    m_settingsView = new SettingsView(parent);
+
+    addTab(m_settingsView->getTab(), "Settings");
+}
+
 void TabController::addTab(QWidget *tab, const QString& title) noexcept
 {
     m_tabView->addTab(tab, title);
