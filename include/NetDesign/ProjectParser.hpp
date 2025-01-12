@@ -27,9 +27,9 @@
 namespace netd {
 
 class ProjectParser {
-    std::istringstream iss;
-    std::ifstream      file;
-    std::string        line;
+    std::istringstream m_iss;
+    std::ifstream      m_file;
+    std::string        m_line;
 
     private:
         std::uint32_t parseCount(void) noexcept;
