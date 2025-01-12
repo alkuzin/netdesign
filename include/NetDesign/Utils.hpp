@@ -31,6 +31,8 @@ QString getItem(const QTableWidget *table, std::size_t row, std::size_t column) 
 
 void printProjectContext(void) noexcept;
 
+void isExistRename(QString& filename, const std::string_view& suffix) noexcept;
+
 } // namespace netd
 
 #endif // NET_DESIGN_UTILS_HPP

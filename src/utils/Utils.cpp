@@ -18,6 +18,7 @@
 
 #include <NetDesign/ProjectContext.hpp>
 #include <NetDesign/Utils.hpp>
+#include <filesystem>
 #include <print>
 
 
@@ -68,6 +69,19 @@ void printProjectContext(void) noexcept
     }
 
     std::println("\nPacket Size: {}", context.m_packetSize);
+}
+
+void isExistRename(QString& filename, const std::string_view& suffix) noexcept
+{
+    auto target = filename.toStdString();
+    auto path   = std::filesystem::path(target);
+
+    if (std::filesystem::exists(path)) {
+        auto dotPosition = target.find_last_of('.');
+
+        if (dotPosition != std::string::npos)
+            filename = QString::fromStdString(target.substr(0, dotPosition) + suffix.data());
+    }
 }
 
 } // namespace netd
