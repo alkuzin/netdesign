@@ -20,6 +20,7 @@ set(UTILS_DIR       ${SRC_DIR}/utils)
 
 # set project source files
 set(SRCS
+    "${MODEL_DIR}/ProjectParser.cpp"
     "${CONTROLLER_DIR}/ProjectController.cpp"
     "${CONTROLLER_DIR}/RouterController.cpp"
     "${CONTROLLER_DIR}/NodeController.cpp"

@@ -33,7 +33,6 @@ RouterController::RouterController(RouterView *routerView) noexcept
         this->savePacketSize();
     });
 
-    // TODO: add message box on save
     setRouterTable();
     setChannelTable();
 }

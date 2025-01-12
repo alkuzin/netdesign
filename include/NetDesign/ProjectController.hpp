@@ -19,6 +19,7 @@
 #ifndef NET_DESIGN_PROJECT_CONTROLLER_HPP
 #define NET_DESIGN_PROJECT_CONTROLLER_HPP
 
+#include <NetDesign/ProjectParser.hpp>
 #include <string>
 
 
@@ -26,6 +27,9 @@ namespace netd {
 
 class ProjectController
 {
+    private:
+        ProjectParser m_parser;
+
     public:
         ProjectController(void) noexcept = default;
 
