@@ -21,14 +21,17 @@ set(UTILS_DIR       ${SRC_DIR}/utils)
 # set project source files
 set(SRCS
     "${MODEL_DIR}/ProjectParser.cpp"
+    "${MODEL_DIR}/NetworkGraph.cpp"
     "${CONTROLLER_DIR}/ProjectController.cpp"
     "${CONTROLLER_DIR}/RouterController.cpp"
+    "${CONTROLLER_DIR}/GraphController.cpp"
     "${CONTROLLER_DIR}/NodeController.cpp"
     "${CONTROLLER_DIR}/MenuController.cpp"
     "${CONTROLLER_DIR}/InfoController.cpp"
     "${CONTROLLER_DIR}/TabController.cpp"
     "${VIEW_DIR}/SettingsView.cpp"
     "${VIEW_DIR}/RouterView.cpp"
+    "${VIEW_DIR}/GraphView.cpp"
     "${VIEW_DIR}/MenuView.cpp"
     "${VIEW_DIR}/NodeView.cpp"
     "${VIEW_DIR}/TabView.cpp"
