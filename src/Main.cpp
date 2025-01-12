@@ -25,7 +25,8 @@ std::int32_t main(std::int32_t argc, char **argv)
 {
     QApplication app(argc, argv);
 
-    auto window = new netd::MainWindow();
+    auto window      = new netd::MainWindow();
+    netd::mainWindow = window;
     window->show();
 
     return app.exec();

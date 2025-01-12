@@ -46,6 +46,7 @@ class SettingsView : public QObject
         QWidget *m_tab;
 
         SettingsView(QWidget *parent = nullptr) noexcept;
+        void updateContent(void) noexcept;
 };
 
 } // namespace netd

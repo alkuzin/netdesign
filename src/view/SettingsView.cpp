@@ -56,4 +56,10 @@ SettingsView::SettingsView(QWidget *parent) noexcept
     m_tab->setLayout(m_mainLayout);
 }
 
+void SettingsView::updateContent(void) noexcept
+{
+    m_nodeController->updateContent();
+    m_routerController->updateContent();
+}
+
 } // namespace netd

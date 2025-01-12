@@ -29,6 +29,7 @@ class GraphController : public QObject
 {
     GraphView        *m_graphView;
     ChannelMemberPtr m_weight;
+    NetworkGraph     m_graph;
 
     public:
         GraphController(GraphView *graphView) noexcept;

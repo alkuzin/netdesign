@@ -35,10 +35,10 @@ class MainWindow : public QMainWindow {
 
     public:
         MainWindow(void) noexcept;
-
-        // TODO: make static
-        void updateTabs(void) noexcept;
+        void updateContent(void) noexcept;
 };
+
+extern MainWindow *mainWindow;
 
 } // namespace netd
 

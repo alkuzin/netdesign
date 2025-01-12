@@ -16,12 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <QtWidgets/QGraphicsPixmapItem>
 #include <QtWidgets/QGraphicsView>
 #include <NetDesign/GraphView.hpp>
 #include <QtWidgets/QPushButton>
+#include <filesystem>
 
 
 namespace netd {
+
+constexpr auto NODE_RADIUS {16};
+
 
 GraphView::GraphView(QWidget *parent) noexcept
 {
@@ -82,6 +87,64 @@ void GraphView::setButtonLayout(void) noexcept
 
     m_buttonLayout->addWidget(m_updateButton);
     m_mainLayout->addLayout(m_buttonLayout);
+}
+
+void GraphView::drawNode(const Node& node) noexcept
+{
+    auto currentPath    = std::filesystem::current_path();
+    auto routerIconPath = QString(currentPath.c_str()) + "/res/router64x64.png";
+
+    // loade the image
+    QPixmap pixmap(routerIconPath);
+
+    // rotate by 180 degrees
+    QTransform transform;
+    transform.rotate(180);
+    auto rotatedPixmap = pixmap.transformed(transform, Qt::SmoothTransformation);
+
+    auto rotatedPixmapItem = new QGraphicsPixmapItem(rotatedPixmap);
+    rotatedPixmapItem->setPos(node.m_x - (NODE_RADIUS), node.m_y - (NODE_RADIUS));
+
+    // set the tooltip for the pixmap item
+    auto tip = QString("Node ID: %1\nName: %2\nPosition: (%3, %4)")
+        .arg(node.m_id).arg(QString::fromStdString(node.m_name)).arg(node.m_x).arg(node.m_y);
+    rotatedPixmapItem->setToolTip(tip);
+
+    // set the tooltip style
+    m_tab->setStyleSheet(
+        "QToolTip {"
+        "color: black;"
+        "background-color: white;"
+        "border: 2px solid black;"
+        "padding: 5px;"
+        "}"
+    );
+
+    m_scene->addItem(rotatedPixmapItem);
+}
+
+void GraphView::drawEdge(const Node& src, const Node& dest, const Channel& channel) noexcept
+{
+    QLineF line(src.m_x, src.m_y, dest.m_x, dest.m_y);
+
+    auto lineItem = new QGraphicsLineItem(line);
+    lineItem->setPen(QPen(Qt::gray));
+
+    auto tip = QString("Channel ID: %1\nCapacity: %2\nPrice: %3")
+        .arg(channel.m_id).arg(channel.m_capacity).arg(channel.m_price);
+
+    lineItem->setToolTip(tip);
+    m_scene->addItem(lineItem);
+
+    // TODO: move in GraphController if needed:
+    // Store the edge descriptor and the corresponding QGraphicsLineItem
+    // auto edge = boost::edge(src.m_id, dest.m_id, m_graph.m_adjList).first; // Assuming Node has an id
+    // m_edgeItems[edge] = lineItem; // Store the line item
+}
+
+void GraphView::clearGraph(void) noexcept
+{
+    m_scene->clear();
 }
 
 } // namespace netd

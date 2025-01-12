@@ -23,9 +23,10 @@ namespace netd {
 
 TabController::TabController(TabView *tabView, QWidget *parent) noexcept
 {
-    m_tabView      = tabView;
-    m_settingsView = new SettingsView(parent);
-    m_graphView    = new GraphView(parent);
+    m_tabView         = tabView;
+    m_settingsView    = new SettingsView(parent);
+    m_graphView       = new GraphView(parent);
+    m_graphController = new GraphController(m_graphView);
 
     addTab(m_settingsView->m_tab, "Settings");
     addTab(m_graphView->m_tab, "Graph");
@@ -34,6 +35,12 @@ TabController::TabController(TabView *tabView, QWidget *parent) noexcept
 void TabController::addTab(QWidget *tab, const QString& title) noexcept
 {
     m_tabView->addTab(tab, title);
+}
+
+void TabController::updateContent(void) noexcept
+{
+    m_settingsView->updateContent();
+    m_graphController->updateContent();
 }
 
 } // namespace netd

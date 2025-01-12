@@ -46,4 +46,11 @@ MainWindow::MainWindow(void) noexcept
     setCentralWidget(m_tabView->getTabWidget());
 }
 
+void MainWindow::updateContent(void) noexcept
+{
+    m_tabController->updateContent();
+}
+
+MainWindow *mainWindow {nullptr};
+
 } // namespace netd

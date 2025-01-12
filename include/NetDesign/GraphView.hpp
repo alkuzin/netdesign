@@ -23,6 +23,7 @@
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QPushButton>
+#include <NetDesign/Channel.hpp>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QComboBox>
 #include <NetDesign/Node.hpp>
@@ -38,18 +39,14 @@ class GraphView : public QObject
         QVBoxLayout    *m_buttonLayout;
         QVBoxLayout    *m_graphLayout;
         QGraphicsScene *m_scene;
-        QLabel         *m_delayLabel;
-        QLabel         *m_priceLabel;
 
         void setGraphLayout(void) noexcept;
         void setButtonLayout(void) noexcept;
-        void drawNode(const Node& node) noexcept;
-        // void drawEdge(const Node& src, const Node& dest, const Channel& channel) noexcept;
-        void clearGraph(void) noexcept;
-        void highlightPath(const std::vector<std::size_t>& path, const QColor& color) noexcept;
 
     public:
         QWidget      *m_tab;
+        QLabel       *m_delayLabel;
+        QLabel       *m_priceLabel;
         QRadioButton *m_priceRadioButton;
         QRadioButton *m_capacityRadioButton;
         QComboBox    *m_srcNodeComboBox;
@@ -57,6 +54,9 @@ class GraphView : public QObject
         QPushButton  *m_updateButton;
 
         GraphView(QWidget *parent = nullptr) noexcept;
+        void drawNode(const Node& node) noexcept;
+        void drawEdge(const Node& src, const Node& dest, const Channel& channel) noexcept;
+        void clearGraph(void) noexcept;
 };
 
 } // namespace netd

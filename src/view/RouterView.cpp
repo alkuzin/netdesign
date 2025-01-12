@@ -86,7 +86,7 @@ void RouterView::setRouterTableLayout(void) noexcept
 void RouterView::setChannelTableLayout(void) noexcept
 {
     auto layout    = new QVBoxLayout();
-    m_channelTable = new QTableWidget(0, 4, m_mainWidget);
+    m_channelTable = new QTableWidget(0, 3, m_mainWidget);
     m_channelTable->setHorizontalHeaderLabels({"ID", "Capacity", "Price"});
     m_channelTable->setMaximumSize(425, 600);
 

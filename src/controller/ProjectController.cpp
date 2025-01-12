@@ -18,6 +18,7 @@
 
 #include <NetDesign/ProjectController.hpp>
 #include <NetDesign/ProjectContext.hpp>
+#include <NetDesign/MainWindow.hpp>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QMessageBox>
@@ -53,6 +54,7 @@ void ProjectController::openProject(void) noexcept
     projectContext.m_filename = std::move(filename.toStdString());
 
     m_parser.parse(projectContext.m_filename);
+    mainWindow->updateContent();
 }
 
 void ProjectController::saveProject(void) noexcept
