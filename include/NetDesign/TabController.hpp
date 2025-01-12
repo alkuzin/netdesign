@@ -20,6 +20,7 @@
 #define NET_DESIGN_TAB_CONTROLLER_HPP
 
 #include <NetDesign/SettingsView.hpp>
+#include <NetDesign/GraphView.hpp>
 #include <NetDesign/TabView.hpp>
 
 
@@ -28,6 +29,7 @@ namespace netd {
 class TabController
 {
     SettingsView *m_settingsView;
+    GraphView    *m_graphView;
     TabView      *m_tabView;
 
     public:

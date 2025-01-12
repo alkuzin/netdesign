@@ -25,8 +25,10 @@ TabController::TabController(TabView *tabView, QWidget *parent) noexcept
 {
     m_tabView      = tabView;
     m_settingsView = new SettingsView(parent);
+    m_graphView    = new GraphView(parent);
 
     addTab(m_settingsView->m_tab, "Settings");
+    addTab(m_graphView->m_tab, "Graph");
 }
 
 void TabController::addTab(QWidget *tab, const QString& title) noexcept
