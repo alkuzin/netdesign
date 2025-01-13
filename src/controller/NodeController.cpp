@@ -158,8 +158,6 @@ void NodeController::updateContent(void) noexcept
     matrixTable->setRowCount(0);
 
     auto& matrix = ProjectContext::instance().m_loadMatrix;
-    matrix.clear();
-    matrix.resize(nodeCount, nodeCount, false);
 
     // update load matrix table
     matrixTable->setRowCount(nodeCount);

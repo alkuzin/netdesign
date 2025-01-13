@@ -54,6 +54,7 @@ void ProjectController::openProject(void) noexcept
     projectContext.m_filename = std::move(filename.toStdString());
 
     m_parser.parse(projectContext.m_filename);
+    printProjectContext();
     mainWindow->updateContent();
 }
 

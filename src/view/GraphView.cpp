@@ -135,11 +135,6 @@ void GraphView::drawEdge(const Node& src, const Node& dest, const Channel& chann
 
     lineItem->setToolTip(tip);
     m_scene->addItem(lineItem);
-
-    // TODO: move in GraphController if needed:
-    // Store the edge descriptor and the corresponding QGraphicsLineItem
-    // auto edge = boost::edge(src.m_id, dest.m_id, m_graph.m_adjList).first; // Assuming Node has an id
-    // m_edgeItems[edge] = lineItem; // Store the line item
 }
 
 void GraphView::clearGraph(void) noexcept

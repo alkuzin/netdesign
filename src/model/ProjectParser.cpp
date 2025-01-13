@@ -65,11 +65,6 @@ void ProjectParser::parse(const std::string_view& filename) noexcept
     }
 
     m_file.close();
-
-    printProjectContext();
-
-    // TODO:
-    // MainWindow::getInstance()->updateTabs();
 }
 
 std::uint32_t ProjectParser::parseCount(void) noexcept

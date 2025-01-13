@@ -18,6 +18,7 @@
 
 #include <NetDesign/GraphController.hpp>
 #include <NetDesign/ProjectContext.hpp>
+#include <QtWidgets/QMessageBox>
 #include <NetDesign/Utils.hpp>
 #include <print>
 
@@ -27,6 +28,7 @@ namespace netd {
 GraphController::GraphController(GraphView *graphView) noexcept
 {
     m_graphView = graphView;
+    m_weight    = &Channel::m_price;
 
     connect(m_graphView->m_priceRadioButton, &QRadioButton::toggled, this, [this]() {
         this->m_weight = &Channel::m_price;
@@ -46,7 +48,6 @@ void GraphController::updateContent(void) noexcept
     printProjectContext();
     m_graph.m_adjList.clear();
     m_graph.set();
-    // m_edgeItems.clear();
     m_graphView->clearGraph();
 
     std::size_t src {0}, dest {0};
@@ -66,8 +67,14 @@ void GraphController::updateContent(void) noexcept
 
     std::uint32_t srcPos {0}, destPos {0};
 
-    srcPos  = static_cast<std::uint32_t>(m_graphView->m_srcNodeComboBox->currentIndex());
-    destPos = static_cast<std::uint32_t>(m_graphView->m_destNodeComboBox->currentIndex());
+    // check that comboboxes are set correctly
+    bool isSrcEmpty  = (m_graphView->m_srcNodeComboBox->count() == 0);
+    bool isDestEmpty = (m_graphView->m_destNodeComboBox->count() == 0);
+
+    if (!isSrcEmpty && !isDestEmpty) {
+        srcPos  = static_cast<std::uint32_t>(m_graphView->m_srcNodeComboBox->currentIndex());
+        destPos = static_cast<std::uint32_t>(m_graphView->m_destNodeComboBox->currentIndex());
+    }
 
     if (m_weight) {
         auto [distances, predecessors] = m_graph.dijkstra(srcPos, m_weight);
@@ -82,8 +89,10 @@ void GraphController::updateContent(void) noexcept
         double totalDelay {0.0};
 
         if (distances[destPos] == std::numeric_limits<std::int32_t>::max()) {
-            std::println("Destination {} is not reachable from source {}", destPos, srcPos);
-            // TODO: add warning message box
+            QString msg = "Destination " + QString::number(destPos) +
+                          " is not reachable from source " + QString::number(srcPos);
+            QMessageBox::warning(nullptr, "Warning", msg, QMessageBox::Ok);
+            return;
         }
 
         std::vector<std::size_t> path;
@@ -112,7 +121,6 @@ void GraphController::updateContent(void) noexcept
         std::putchar('\n');
 
         std::println("Total price: {}\nTotal delay: {}", totalPrice, totalDelay);
-        // m_graphView->highlightPath(predecessors, Qt::red);
 
         // TODO: count average delay for this route
         // TODO: count average delay for whole network
