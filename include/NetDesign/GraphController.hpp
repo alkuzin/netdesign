@@ -34,14 +34,11 @@ class GraphController : public QObject
 
         void updateEdgeTable(void) noexcept;
         void insertEdgeTableRow(bool flag) noexcept;
-        void calculateDelays(std::size_t src) noexcept;
+        void calculateDelays(void) noexcept;
 
     public:
         GraphController(GraphView *graphView) noexcept;
         void updateContent(void) noexcept;
-
-    private:
-
 };
 
 } // namespace netd

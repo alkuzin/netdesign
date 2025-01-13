@@ -90,7 +90,8 @@ void GraphView::setButtonLayout(void) noexcept
     m_buttonLayout->addWidget(m_destNodeComboBox);
     m_buttonLayout->setAlignment(Qt::AlignTop);
 
-    m_updateButton = new QPushButton("Update");
+    m_findRouteButton = new QPushButton("Find Route");
+    m_updateButton    = new QPushButton("Update");
 
     // connect nodes
     setEdgeTable();
@@ -98,6 +99,7 @@ void GraphView::setButtonLayout(void) noexcept
     m_removeButton = new QPushButton("Remove");
     m_submitButton = new QPushButton("Submit");
 
+    m_buttonLayout->addWidget(m_findRouteButton);
     m_buttonLayout->addWidget(m_updateButton);
     m_buttonLayout->addWidget(m_edgeTable);
     m_buttonLayout->addWidget(m_addButton);

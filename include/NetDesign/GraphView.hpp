@@ -53,6 +53,7 @@ class GraphView : public QObject
         QRadioButton *m_capacityRadioButton;
         QComboBox    *m_srcNodeComboBox;
         QComboBox    *m_destNodeComboBox;
+        QPushButton  *m_findRouteButton;
         QPushButton  *m_updateButton;
 
         QTableWidget *m_edgeTable;

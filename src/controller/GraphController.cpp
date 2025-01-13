@@ -72,6 +72,11 @@ GraphController::GraphController(GraphView *graphView) noexcept
         this->m_weight = &Channel::m_capacity;
     });
 
+    connect(m_graphView->m_findRouteButton, &QPushButton::clicked, [this]() {
+        this->calculateDelays();
+
+    });
+
     connect(m_graphView->m_updateButton, &QPushButton::clicked, [this]() {
         this->updateContent();
     });
@@ -193,8 +198,6 @@ void GraphController::updateContent(void) noexcept
     for (const auto& vertex : boost::make_iterator_range(boost::vertices(m_graph.m_adjList)))
         m_graphView->drawNode(m_graph.m_adjList[vertex]);
 
-    calculateDelays(src);
-
     // fill comboboxes
     m_graphView->m_srcNodeComboBox->clear();
     m_graphView->m_destNodeComboBox->clear();
@@ -206,7 +209,7 @@ void GraphController::updateContent(void) noexcept
     }
 }
 
-void GraphController::calculateDelays(std::size_t src) noexcept
+void GraphController::calculateDelays(void) noexcept
 {
     std::uint32_t srcPos {0}, destPos {0};
 
@@ -223,7 +226,7 @@ void GraphController::calculateDelays(std::size_t src) noexcept
         auto [distances, predecessors] = m_graph.dijkstra(srcPos, m_weight);
 
         // output the results
-        std::println("Distances from node {}:", src);
+        std::println("Distances from node {}:", srcPos);
 
         for (std::size_t i = 0; i < distances.size(); ++i)
             std::println("To node {}: {}", i, distances[i]);
