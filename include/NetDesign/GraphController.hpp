@@ -27,9 +27,14 @@ namespace netd {
 
 class GraphController : public QObject
 {
-    GraphView        *m_graphView;
-    ChannelMemberPtr m_weight;
-    NetworkGraph     m_graph;
+    private:
+        GraphView        *m_graphView;
+        ChannelMemberPtr m_weight;
+        NetworkGraph     m_graph;
+
+        void updateEdgeTable(void) noexcept;
+        void insertEdgeTableRow(bool flag) noexcept;
+        void calculateDelays(std::size_t src) noexcept;
 
     public:
         GraphController(GraphView *graphView) noexcept;

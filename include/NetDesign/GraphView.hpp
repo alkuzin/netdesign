@@ -20,6 +20,7 @@
 #define NET_DESIGN_GRAPH_VIEW_HPP
 
 #include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QPushButton>
@@ -42,6 +43,7 @@ class GraphView : public QObject
 
         void setGraphLayout(void) noexcept;
         void setButtonLayout(void) noexcept;
+        void setEdgeTable(void) noexcept;
 
     public:
         QWidget      *m_tab;
@@ -52,6 +54,11 @@ class GraphView : public QObject
         QComboBox    *m_srcNodeComboBox;
         QComboBox    *m_destNodeComboBox;
         QPushButton  *m_updateButton;
+
+        QTableWidget *m_edgeTable;
+        QPushButton  *m_addButton;
+        QPushButton  *m_removeButton;
+        QPushButton  *m_submitButton;
 
         GraphView(QWidget *parent = nullptr) noexcept;
         void drawNode(const Node& node) noexcept;

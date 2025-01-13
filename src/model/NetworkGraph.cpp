@@ -28,7 +28,7 @@ namespace netd {
 void NetworkGraph::set(void) noexcept
 {
     auto& projectContext = ProjectContext::instance();
-    auto& loadMatrix     = projectContext.m_loadMatrix;
+    auto& edgeTable      = projectContext.m_edgeTable;
     auto& channels       = projectContext.m_channels;
     auto& nodes          = projectContext.m_nodes;
 
@@ -36,16 +36,13 @@ void NetworkGraph::set(void) noexcept
     for (const auto& node : nodes)
         boost::add_vertex(node, m_adjList);
 
-    // TODO: comboBox for selecting specific channels to use
     // add channels
-    for (std::size_t i = 0; i < nodes.size(); i++) {
-        for (std::size_t j = i + 1; j < nodes.size(); j++) {
-            if (loadMatrix(i, j) > 0 && loadMatrix(j, i) > 0) {
-                auto channel       = channels.at(i);
-                channel.m_capacity = loadMatrix(i, j);
-                boost::add_edge(i, j, channel, m_adjList);
-            }
-        }
+    for (std::size_t i = 0; i < edgeTable.size1(); i++) {
+        auto srcNodeID  = edgeTable(i, 0);
+        auto destNodeID = edgeTable(i, 1);
+        auto channelID  = edgeTable(i, 2);
+
+        boost::add_edge(srcNodeID, destNodeID, channels.at(channelID), m_adjList);
     }
 }
 

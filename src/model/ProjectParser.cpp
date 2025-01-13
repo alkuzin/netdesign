@@ -54,6 +54,9 @@ void ProjectParser::parse(const std::string_view& filename) noexcept
         if (m_line.compare("# Load Matrix") == 0)
             parseLoadMatrix();
 
+        if (m_line.compare("# Edge Table") == 0)
+            parseEdgeTable();
+
         if (m_line.compare("# Routers") == 0)
             parseRouters();
 
@@ -125,6 +128,27 @@ void ProjectParser::parseLoadMatrix(void) noexcept
         for (std::uint32_t j = 0; j < matrixCount; j++) {
             m_iss >> value >> delim;
             projectContext.m_loadMatrix(i, j) = value;
+        }
+    }
+}
+
+void ProjectParser::parseEdgeTable(void) noexcept
+{
+    auto matrixCount = parseCount();
+    if (matrixCount)
+        projectContext.m_edgeTable.resize(matrixCount, 3);
+
+    std::uint32_t value;
+    char delim;
+
+    for (std::uint32_t i = 0; i < matrixCount; i++) {
+        std::getline(m_file, m_line);
+        m_iss.clear();
+        m_iss.str(m_line);
+
+        for (std::uint32_t j = 0; j < 3; j++) {
+            m_iss >> value >> delim;
+            projectContext.m_edgeTable(i, j) = value;
         }
     }
 }

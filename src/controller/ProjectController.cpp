@@ -73,7 +73,7 @@ void ProjectController::saveProject(void) noexcept
         return;
     }
 
-    // saving nodes
+    // save nodes
     fout << "# Nodes\n";
     fout << "count," << context.m_nodes.size() << "\n";
     fout << "id,name,x,y\n";
@@ -86,7 +86,7 @@ void ProjectController::saveProject(void) noexcept
     }
     fout << "\n";
 
-    // saving load matrix
+    // save load matrix
     auto matrixCount = context.m_loadMatrix.size1();
 
     fout << "# Load Matrix\n";
@@ -99,7 +99,20 @@ void ProjectController::saveProject(void) noexcept
     }
     fout << "\n";
 
-    // saving routers
+    // save edge table
+    auto edgeCount = context.m_edgeTable.size1();
+
+    fout << "# Edge Table\n";
+    fout << "count," << edgeCount << "\n";
+
+    for (std::size_t i = 0; i < edgeCount; i++) {
+        for (std::size_t j = 0; j < 3; j++)
+            fout << context.m_edgeTable(i, j) << ",";
+        fout << "\n";
+    }
+    fout << "\n";
+
+    // save routers
     fout << "# Routers\n";
     fout << "count," << context.m_routers.size() << "\n";
     fout << "id,model,capacity,price\n";
@@ -112,7 +125,7 @@ void ProjectController::saveProject(void) noexcept
     }
     fout << "\n";
 
-    // saving channels
+    // save channels
     fout << "# Channels\n";
     fout << "count," << context.m_channels.size() << "\n";
     fout << "id,capacity,price\n";

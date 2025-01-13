@@ -35,6 +35,7 @@ class ProjectParser {
         std::uint32_t parseCount(void) noexcept;
         void parseNodes(void) noexcept;
         void parseLoadMatrix(void) noexcept;
+        void parseEdgeTable(void) noexcept;
         void parseRouters(void) noexcept;
         void parseChannels(void) noexcept;
 

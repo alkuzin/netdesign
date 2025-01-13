@@ -28,8 +28,8 @@
 
 namespace netd {
 
-namespace ublas  = boost::numeric::ublas;
-using LoadMatrix = ublas::matrix<std::uint32_t>;
+namespace ublas = boost::numeric::ublas;
+using Matrix    = ublas::matrix<std::uint32_t>;
 
 class ProjectContext {
     private:
@@ -41,7 +41,8 @@ class ProjectContext {
         std::vector<Node>     m_nodes;
         std::uint32_t         m_packetSize;
         std::string           m_filename;
-        LoadMatrix            m_loadMatrix;
+        Matrix                m_loadMatrix;
+        Matrix                m_edgeTable;
 
         static ProjectContext& instance(void) noexcept {
             static ProjectContext instance;

@@ -54,6 +54,15 @@ void printProjectContext(void) noexcept
     }
     std::putchar('\n');
 
+    std::puts("\nEdge Table:");
+    for (size_t i = 0; i < context.m_edgeTable.size1(); i++) {
+        std::putchar('|');
+        for (size_t j = 0; j < 3; j++)
+            std::print(" {:>3}", context.m_edgeTable(i, j));
+        std::puts("   |");
+    }
+    std::putchar('\n');
+
     std::puts("\nRouter Table:");
     for (const auto& router : context.m_routers) {
         std::println("router: | id: {}, model: {}, capacity: {}, price: {} |",

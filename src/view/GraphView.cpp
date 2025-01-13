@@ -63,6 +63,13 @@ void GraphView::setGraphLayout(void) noexcept
     m_mainLayout->addLayout(m_graphLayout);
 }
 
+void GraphView::setEdgeTable(void) noexcept
+{
+    m_edgeTable = new QTableWidget(0, 3, m_tab);
+    m_edgeTable->setHorizontalHeaderLabels({"Source Node", "Destination Node", "Channel"});
+    m_edgeTable->setMaximumWidth(315);
+}
+
 void GraphView::setButtonLayout(void) noexcept
 {
     m_buttonLayout     = new QVBoxLayout();
@@ -85,7 +92,17 @@ void GraphView::setButtonLayout(void) noexcept
 
     m_updateButton = new QPushButton("Update");
 
+    // connect nodes
+    setEdgeTable();
+    m_addButton    = new QPushButton("Add");
+    m_removeButton = new QPushButton("Remove");
+    m_submitButton = new QPushButton("Submit");
+
     m_buttonLayout->addWidget(m_updateButton);
+    m_buttonLayout->addWidget(m_edgeTable);
+    m_buttonLayout->addWidget(m_addButton);
+    m_buttonLayout->addWidget(m_removeButton);
+    m_buttonLayout->addWidget(m_submitButton);
     m_mainLayout->addLayout(m_buttonLayout);
 }
 
@@ -128,7 +145,7 @@ void GraphView::drawEdge(const Node& src, const Node& dest, const Channel& chann
     QLineF line(src.m_x, src.m_y, dest.m_x, dest.m_y);
 
     auto lineItem = new QGraphicsLineItem(line);
-    lineItem->setPen(QPen(Qt::gray));
+    lineItem->setPen(QPen(Qt::gray, 3));
 
     auto tip = QString("Channel ID: %1\nCapacity: %2\nPrice: %3")
         .arg(channel.m_id).arg(channel.m_capacity).arg(channel.m_price);

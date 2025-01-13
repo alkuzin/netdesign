@@ -18,12 +18,46 @@
 
 #include <NetDesign/GraphController.hpp>
 #include <NetDesign/ProjectContext.hpp>
+#include <QtWidgets/QInputDialog>
 #include <QtWidgets/QMessageBox>
 #include <NetDesign/Utils.hpp>
 #include <print>
 
 
 namespace netd {
+
+static auto& context = ProjectContext::instance();
+
+static std::uint32_t findNodeID(const std::string_view& name) noexcept
+{
+    auto it = std::find_if(context.m_nodes.begin(), context.m_nodes.end(),
+        [&name](const Node& node) {
+            return node.m_name.compare(name.data()) == 0;
+        });
+
+    if (it != context.m_nodes.end())
+        return it.base()->m_id;
+    else
+        QMessageBox::warning(nullptr, "Error", "Could not find node");
+
+    return 1;
+}
+
+static std::uint32_t findChannelID(const std::uint32_t capacity) noexcept
+{
+    auto it = std::find_if(context.m_channels.begin(), context.m_channels.end(),
+        [&capacity](const Channel& channel) {
+            return channel.m_capacity == capacity;
+        });
+
+    if (it != context.m_channels.end())
+        return it.base()->m_id;
+    else
+        QMessageBox::warning(nullptr, "Error", "Could not find channel");
+
+    return 1;
+}
+
 
 GraphController::GraphController(GraphView *graphView) noexcept
 {
@@ -41,11 +75,105 @@ GraphController::GraphController(GraphView *graphView) noexcept
     connect(m_graphView->m_updateButton, &QPushButton::clicked, [this]() {
         this->updateContent();
     });
+
+    // handle edge table buttons
+    connect(m_graphView->m_addButton, &QPushButton::clicked, this, [this]() {
+        this->insertEdgeTableRow(false);
+    });
+
+    connect(m_graphView->m_removeButton, &QPushButton::clicked, this, [this]() {
+        auto table = this->m_graphView->m_edgeTable;
+        bool ok;
+
+        QString rowStr = QInputDialog::getText(nullptr, "Remove row", "Row:", QLineEdit::Normal, "", &ok);
+
+        if (ok && !rowStr.isEmpty()) {
+            std::int32_t row = rowStr.toInt() - 1;
+
+            if (row >= 0 && row < table->rowCount())
+                table->removeRow(row);
+            else
+                QMessageBox::warning(nullptr, "Error", "Incorrect row");
+        }
+    });
+
+    connect(m_graphView->m_submitButton, &QPushButton::clicked, this, [this]() {
+        auto table = this->m_graphView->m_edgeTable;
+
+        context.m_edgeTable.resize(table->rowCount(), 3);
+
+        for (std::int32_t row = 0; row < table->rowCount(); ++row) {
+            auto srcComboBox     = qobject_cast<QComboBox*>(table->cellWidget(row, 0));
+            auto destComboBox    = qobject_cast<QComboBox*>(table->cellWidget(row, 1));
+            auto channelComboBox = qobject_cast<QComboBox*>(table->cellWidget(row, 2));
+
+            if (srcComboBox && destComboBox && channelComboBox) {
+                auto srcValue     = srcComboBox->currentText().toStdString();
+                auto destValue    = destComboBox->currentText().toStdString();
+                auto channelValue = channelComboBox->currentText().toUInt();
+
+                context.m_edgeTable(row, 0) = findNodeID(srcValue) - 1;
+                context.m_edgeTable(row, 1) = findNodeID(destValue) - 1;
+                context.m_edgeTable(row, 2) = findChannelID(channelValue) - 1;
+            }
+        }
+
+        QMessageBox::information(nullptr, "Success", "Successfully updated edges & vertices");
+    });
+}
+
+void GraphController::insertEdgeTableRow(bool flag) noexcept
+{
+    const auto& context = ProjectContext::instance();
+    auto& table         = m_graphView->m_edgeTable;
+    auto row            = table->rowCount();
+    table->insertRow(row);
+
+    auto srcComboBox  = new QComboBox();
+    auto destComboBox = new QComboBox();
+
+    // add source & destination nodes
+    for (const auto& node : context.m_nodes) {
+        srcComboBox->addItem(QString::fromStdString(node.m_name));
+        destComboBox->addItem(QString::fromStdString(node.m_name));
+    }
+
+    table->setCellWidget(row, 0, srcComboBox);
+    table->setCellWidget(row, 1, destComboBox);
+
+    // add channels
+    auto channelComboBox = new QComboBox();
+
+    for (const auto& channel : context.m_channels)
+        channelComboBox->addItem(QString::number(channel.m_capacity));
+
+    table->setCellWidget(row, 2, channelComboBox);
+
+    if (flag) {
+        srcComboBox->setCurrentIndex(context.m_edgeTable(row, 0));
+        destComboBox->setCurrentIndex(context.m_edgeTable(row, 1));
+        channelComboBox->setCurrentIndex(context.m_edgeTable(row, 2));
+    }
+}
+
+void GraphController::updateEdgeTable(void) noexcept
+{   const auto& context = ProjectContext::instance();
+    auto& table         = m_graphView->m_edgeTable;
+
+    // clear table
+    table->setRowCount(0);
+
+    // fill the table with combo boxes
+    auto rows = static_cast<std::int32_t>(context.m_edgeTable.size1());
+
+    for (std::int32_t row = 0; row < rows; row++)
+        insertEdgeTableRow(true);
 }
 
 void GraphController::updateContent(void) noexcept
 {
-    printProjectContext();
+    // printProjectContext();
+    updateEdgeTable();
     m_graph.m_adjList.clear();
     m_graph.set();
     m_graphView->clearGraph();
@@ -65,6 +193,21 @@ void GraphController::updateContent(void) noexcept
     for (const auto& vertex : boost::make_iterator_range(boost::vertices(m_graph.m_adjList)))
         m_graphView->drawNode(m_graph.m_adjList[vertex]);
 
+    calculateDelays(src);
+
+    // fill comboboxes
+    m_graphView->m_srcNodeComboBox->clear();
+    m_graphView->m_destNodeComboBox->clear();
+
+    for (const auto& node : ProjectContext::instance().m_nodes) {
+        auto str = QString::fromStdString(node.m_name);
+        m_graphView->m_srcNodeComboBox->addItem(str);
+        m_graphView->m_destNodeComboBox->addItem(str);
+    }
+}
+
+void GraphController::calculateDelays(std::size_t src) noexcept
+{
     std::uint32_t srcPos {0}, destPos {0};
 
     // check that comboboxes are set correctly
@@ -106,6 +249,9 @@ void GraphController::updateContent(void) noexcept
                 auto& channel = m_graph.m_adjList[edgePair.first];
                 totalPrice += channel.m_price;
                 // TODO:
+                // if (capacity <= load) {
+                //     return std::numeric_limits<double>::infinity(); // Бесконечная задержка, если нагрузка превышает пропускную способность
+                // }
                 // totalDelay += calculateDelay(channel.capacity, projectContext.loadMatrix(predecessors[v], v));
             }
         }
@@ -127,16 +273,6 @@ void GraphController::updateContent(void) noexcept
         // TODO: count price of routers
         m_graphView->m_delayLabel->setText("Delay: " + QString::number(totalDelay));
         m_graphView->m_priceLabel->setText("Price: " + QString::number(totalPrice));
-    }
-
-    // fill comboboxes
-    m_graphView->m_srcNodeComboBox->clear();
-    m_graphView->m_destNodeComboBox->clear();
-
-    for (const auto& node : ProjectContext::instance().m_nodes) {
-        auto str = QString::fromStdString(node.m_name);
-        m_graphView->m_srcNodeComboBox->addItem(str);
-        m_graphView->m_destNodeComboBox->addItem(str);
     }
 }
 
