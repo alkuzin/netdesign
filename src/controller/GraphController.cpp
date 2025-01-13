@@ -58,6 +58,19 @@ static std::uint32_t findChannelID(const std::uint32_t capacity) noexcept
     return 1;
 }
 
+static std::uint32_t calculateDelay(double capacity, double load) noexcept
+{
+    if ((load / capacity) >= 1.0) {
+        QMessageBox::warning(nullptr, "Error", "Infinite delay", QMessageBox::Ok);
+        return 0;
+    }
+
+    // M/D/1
+    double leftPart  = 1 / (2 * capacity);
+    double rightPart = load / (capacity * (capacity - load));
+
+    return static_cast<std::uint32_t>((leftPart + rightPart) * 100);
+}
 
 GraphController::GraphController(GraphView *graphView) noexcept
 {
@@ -222,6 +235,11 @@ void GraphController::calculateDelays(void) noexcept
         destPos = static_cast<std::uint32_t>(m_graphView->m_destNodeComboBox->currentIndex());
     }
 
+    if (srcPos == destPos) {
+        QMessageBox::warning(nullptr, "Error", "Incorrect node positions", QMessageBox::Ok);
+        return;
+    }
+
     if (m_weight) {
         auto [distances, predecessors] = m_graph.dijkstra(srcPos, m_weight);
 
@@ -231,8 +249,7 @@ void GraphController::calculateDelays(void) noexcept
         for (std::size_t i = 0; i < distances.size(); ++i)
             std::println("To node {}: {}", i, distances[i]);
 
-        std::uint32_t totalPrice {0};
-        double totalDelay {0.0};
+        std::uint32_t totalPrice {0}, routeDelay {0}, totalDelay {0};
 
         if (distances[destPos] == std::numeric_limits<std::int32_t>::max()) {
             QString msg = "Destination " + QString::number(destPos) +
@@ -251,14 +268,11 @@ void GraphController::calculateDelays(void) noexcept
             if (edgePair.second) { // Check if the edge exists
                 auto& channel = m_graph.m_adjList[edgePair.first];
                 totalPrice += channel.m_price;
-                // TODO:
-                // if (capacity <= load) {
-                //     return std::numeric_limits<double>::infinity(); // Бесконечная задержка, если нагрузка превышает пропускную способность
-                // }
-                // totalDelay += calculateDelay(channel.capacity, projectContext.loadMatrix(predecessors[v], v));
             }
         }
+
         path.push_back(srcPos);
+        IGNORE_UNUSED(calculateDelay, routeDelay);
 
         // reversing the path to get it from src to dest
         std::reverse(path.begin(), path.end());
@@ -266,10 +280,53 @@ void GraphController::calculateDelays(void) noexcept
         // output the path
         std::println("Path from {} to {}: ", srcPos, destPos);
         for (const auto& node : path)
-            std::print("{} ", node);
-        std::putchar('\n');
+            std::print("{} ->", node + 1);
+        std::puts(" x");
 
-        std::println("Total price: {}\nTotal delay: {}", totalPrice, totalDelay);
+        std::uint32_t load {0}, capacity {0};
+
+        for (std::size_t j = 0; j < context.m_loadMatrix.size2(); j++)
+            load += context.m_loadMatrix(destPos, j);
+
+        std::size_t lastChannelNode1 {0}, lastChannelNode2 {0};
+
+        lastChannelNode1 = path.back();
+        lastChannelNode2 = path.at(path.size() - 2);
+
+        const auto& edgeTable = context.m_edgeTable;
+
+        for (std::size_t i = 0; i < edgeTable.size1(); i++) {
+            const auto& node1 = edgeTable(i, 0);
+            const auto& node2 = edgeTable(i, 1);
+
+            bool isCondition1 = lastChannelNode1 == node1 && lastChannelNode2 == node2;
+            bool isCondition2 = lastChannelNode2 == node1 && lastChannelNode1 == node2;
+
+            if (isCondition1 || isCondition2) {
+                capacity = context.m_channels.at(edgeTable(i, 2)).m_capacity;
+                break;
+            }
+        }
+
+        capacity /= context.m_packetSize;   // capacity (packets/sec)
+        load     /= context.m_packetSize;   // load (packets/sec)
+
+        std::println("Capacity: {}", capacity);
+        std::println("Load:     {}", load);
+
+        if (capacity == 0) {
+            QMessageBox::warning(nullptr, "Error", "Incorrect capacity", QMessageBox::Ok);
+            return;
+        }
+
+        routeDelay = calculateDelay(
+            static_cast<double>(capacity),
+            static_cast<double>(load)
+        );
+
+        std::println("Total price: {}", totalPrice);
+        std::println("Total delay: {}", totalDelay);
+        std::println("Route delay: {}", routeDelay);
 
         // TODO: count average delay for this route
         // TODO: count average delay for whole network
