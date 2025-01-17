@@ -47,7 +47,8 @@ class GraphView : public QObject
 
     public:
         QWidget      *m_tab;
-        QLabel       *m_delayLabel;
+        QLabel       *m_totalDelayLabel;
+        QLabel       *m_routeDelayLabel;
         QLabel       *m_priceLabel;
         QRadioButton *m_priceRadioButton;
         QRadioButton *m_capacityRadioButton;

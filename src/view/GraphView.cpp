@@ -75,10 +75,12 @@ void GraphView::setButtonLayout(void) noexcept
     m_buttonLayout     = new QVBoxLayout();
     m_srcNodeComboBox  = new QComboBox();
     m_destNodeComboBox = new QComboBox();
-    m_delayLabel       = new QLabel("Delay: ");
+    m_totalDelayLabel  = new QLabel("Route Delay: ");
+    m_routeDelayLabel  = new QLabel("Total Delay: ");
     m_priceLabel       = new QLabel("Price: ");
 
-    m_buttonLayout->addWidget(m_delayLabel);
+    m_buttonLayout->addWidget(m_totalDelayLabel);
+    m_buttonLayout->addWidget(m_routeDelayLabel);
     m_buttonLayout->addWidget(m_priceLabel);
 
     m_priceRadioButton    = new QRadioButton("Price", m_tab);
