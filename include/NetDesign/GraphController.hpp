@@ -35,7 +35,9 @@ class GraphController : public QObject
         void updateEdgeTable(void) noexcept;
         void insertEdgeTableRow(bool flag) noexcept;
         void calculateDelays(void) noexcept;
+        std::tuple<std::uint32_t, std::uint32_t> calculateRouteDelay(void) noexcept;
         std::uint32_t calculateDelay(double capacity, double load) noexcept;
+        std::uint32_t calculateTotalDelay(void) noexcept;
 
 
     public:

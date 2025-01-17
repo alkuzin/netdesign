@@ -222,7 +222,27 @@ void GraphController::updateContent(void) noexcept
 
 void GraphController::calculateDelays(void) noexcept
 {
-    std::uint32_t srcPos {0}, destPos {0};
+    auto [routeDelay, totalPrice] = calculateRouteDelay();
+
+    if (routeDelay == std::numeric_limits<std::uint32_t>::max())
+        m_graphView->m_routeDelayLabel->setText("Route Delay: Infinite Delay");
+    else
+        m_graphView->m_routeDelayLabel->setText("Route Delay: " + QString::number(routeDelay) + " ms");
+
+    auto totalDelay = calculateTotalDelay();
+
+    m_graphView->m_priceLabel->setText("Price: " + QString::number(totalPrice));
+    m_graphView->m_totalDelayLabel->setText("Total Delay: " + QString::number(totalDelay) + " ms");
+
+    std::println("Total price: {}", totalPrice);
+    std::println("Route delay: {} ms", routeDelay);
+    std::println("Total delay: {} ms", totalDelay);
+
+}
+
+std::tuple<std::uint32_t, std::uint32_t> GraphController::calculateRouteDelay(void) noexcept
+{
+    std::uint32_t srcPos {0}, destPos {0}, routeDelay {0}, totalPrice {0};
 
     // check that comboboxes are set correctly
     bool isSrcEmpty  = (m_graphView->m_srcNodeComboBox->count() == 0);
@@ -235,7 +255,7 @@ void GraphController::calculateDelays(void) noexcept
 
     if (srcPos == destPos) {
         QMessageBox::warning(nullptr, "Error", "Incorrect node positions", QMessageBox::Ok);
-        return;
+        return {0, 0};
     }
 
     if (m_weight) {
@@ -247,15 +267,17 @@ void GraphController::calculateDelays(void) noexcept
         for (std::size_t i = 0; i < distances.size(); ++i)
             std::println("To node {}: {}", i, distances[i]);
 
-        std::uint32_t totalPrice {0}, routeDelay {0}, totalDelay {0};
+        std::uint32_t totalPrice {0};
 
         if (distances[destPos] == std::numeric_limits<std::int32_t>::max()) {
+            m_graphView->m_routeDelayLabel->setText("Route Delay: 0 ms");
+            m_graphView->m_totalDelayLabel->setText("Total Delay: 0 ms");
+
             QString msg = "Destination " + QString::number(destPos) +
                           " is not reachable from source " + QString::number(srcPos);
             QMessageBox::warning(nullptr, "Warning", msg, QMessageBox::Ok);
-            m_graphView->m_routeDelayLabel->setText("Route Delay: 0 ms");
-            m_graphView->m_totalDelayLabel->setText("Total Delay: 0 ms");
-            return;
+
+            return {0, 0};
         }
 
         std::vector<std::size_t> path;
@@ -265,7 +287,8 @@ void GraphController::calculateDelays(void) noexcept
 
             // get the edge descriptor between predecessors[v] and v
             auto edgePair = boost::edge(predecessors[v], v, m_graph.m_adjList);
-            if (edgePair.second) { // Check if the edge exists
+
+            if (edgePair.second) {
                 auto& channel = m_graph.m_adjList[edgePair.first];
                 totalPrice += channel.m_price;
             }
@@ -317,82 +340,73 @@ void GraphController::calculateDelays(void) noexcept
             QMessageBox::warning(nullptr, "Error", "Incorrect capacity", QMessageBox::Ok);
             m_graphView->m_routeDelayLabel->setText("Route Delay: 0 ms");
             m_graphView->m_totalDelayLabel->setText("Total Delay: 0 ms");
-            return;
+            return {};
         }
 
         routeDelay = calculateDelay(static_cast<double>(capacity), static_cast<double>(load));
+    }
 
-        if (routeDelay == std::numeric_limits<std::uint32_t>::max())
-            m_graphView->m_routeDelayLabel->setText("Route Delay: Infinite Delay");
-        else
-            m_graphView->m_routeDelayLabel->setText("Route Delay: " + QString::number(routeDelay) + " ms");
+    return std::tie(routeDelay, totalPrice);
+}
 
-        std::println("Total price: {}", totalPrice);
-        std::println("Total delay: {} ms", totalDelay);
-        std::println("Route delay: {} ms", routeDelay);
+std::uint32_t GraphController::calculateTotalDelay(void) noexcept
+{
+    // Initialize total delay and count of reachable routes
+    std::uint32_t totalDelay {0}, routeCount {0};
 
-        m_graphView->m_totalDelayLabel->setText("Total Delay: " + QString::number(totalDelay) + " ms");
-        m_graphView->m_priceLabel->setText("Price: " + QString::number(totalPrice));
+    auto nodeCount = static_cast<std::uint32_t>(boost::num_vertices(m_graph.m_adjList));
 
-        // Initialize total delay and count of reachable routes
-        std::uint32_t totalNetworkDelay {0};
-        std::size_t routeCount {0};
-        auto nodeCount = static_cast<std::uint32_t>(boost::num_vertices(m_graph.m_adjList));
+    for (std::uint32_t src = 0; src < nodeCount; ++src) {
+        auto [distances, predecessors] = m_graph.dijkstra(src, m_weight);
 
-        for (std::uint32_t src = 0; src < nodeCount; ++src) {
-            auto [distances, predecessors] = m_graph.dijkstra(src, m_weight);
+        for (std::size_t dest = 0; dest < nodeCount; ++dest) {
+            if (src != dest && distances[dest] != std::numeric_limits<std::int32_t>::max()) {
+                // reconstruct the path from src to dest
+                std::vector<std::size_t> path;
+                for (VertexDescriptor v = dest; v != src; v = predecessors[v])
+                    path.push_back(v);
+                path.push_back(src);
+                std::reverse(path.begin(), path.end());
 
-            for (std::size_t dest = 0; dest < nodeCount; ++dest) {
-                if (src != dest && distances[dest] != std::numeric_limits<std::int32_t>::max()) {
-                    // Reconstruct the path from src to dest
-                    std::vector<std::size_t> path;
-                    for (VertexDescriptor v = dest; v != src; v = predecessors[v]) {
-                        path.push_back(v);
+                // calculate load and capacity for the last edge in the path
+                std::uint32_t load {0}, capacity {0};
+                auto lastChannelNode1 = path.back();
+                auto lastChannelNode2 = path.at(path.size() - 2);
+
+                const auto& edgeTable = context.m_edgeTable;
+
+                for (std::size_t i = 0; i < edgeTable.size1(); i++) {
+                    const auto& node1 = edgeTable(i, 0);
+                    const auto& node2 = edgeTable(i, 1);
+
+                    if ((lastChannelNode1 == node1 && lastChannelNode2 == node2) ||
+                        (lastChannelNode2 == node1 && lastChannelNode1 == node2)) {
+                        capacity = context.m_channels.at(edgeTable(i, 2)).m_capacity;
+                        break;
                     }
-                    path.push_back(src);
-                    std::reverse(path.begin(), path.end());
+                }
 
-                    // Calculate load and capacity for the last edge in the path
-                    std::uint32_t load {0}, capacity {0};
-                    std::size_t lastChannelNode1 = path.back();
-                    std::size_t lastChannelNode2 = path.at(path.size() - 2);
+                // calculate load for the destination node
+                for (std::size_t j = 0; j < context.m_loadMatrix.size2(); j++)
+                    load += context.m_loadMatrix(dest, j);
 
-                    // Assuming context.m_edgeTable and context.m_channels are defined
-                    const auto& edgeTable = context.m_edgeTable;
-                    for (std::size_t i = 0; i < edgeTable.size1(); i++) {
-                        const auto& node1 = edgeTable(i, 0);
-                        const auto& node2 = edgeTable(i, 1);
+                // convert capacity and load to packets/sec
+                capacity /= context.m_packetSize;
+                load     /= context.m_packetSize;
 
-                        if ((lastChannelNode1 == node1 && lastChannelNode2 == node2) ||
-                            (lastChannelNode2 == node1 && lastChannelNode1 == node2)) {
-                            capacity = context.m_channels.at(edgeTable(i, 2)).m_capacity;
-                            break;
-                        }
-                    }
-
-                    // Calculate load for the destination node
-                    for (std::size_t j = 0; j < context.m_loadMatrix.size2(); j++) {
-                        load += context.m_loadMatrix(dest, j);
-                    }
-
-                    // Convert capacity and load to packets/sec
-                    capacity /= context.m_packetSize;
-                    load     /= context.m_packetSize;
-
-                    // Calculate the route delay using the calculateDelay function
-                    if (capacity > 0) {
-                        std::uint32_t routeDelay = calculateDelay(static_cast<double>(capacity), static_cast<double>(load));
-                        totalNetworkDelay += routeDelay; // Accumulate the route delay
-                        ++routeCount; // Count the route
-                    }
+                // calculate the route delay
+                if (capacity > 0) {
+                    totalDelay += calculateDelay(static_cast<double>(capacity), static_cast<double>(load));
+                    ++routeCount;
                 }
             }
         }
-
-        auto averageNetworkDelay = (routeCount > 0) ? (totalNetworkDelay / routeCount) : 0;
-        std::println("Average Network Delay: {} ms", averageNetworkDelay);
-        m_graphView->m_totalDelayLabel->setText("Total Delay: " + QString::number(averageNetworkDelay) + " ms");
     }
+
+    auto averageDelay = (routeCount > 0) ? (totalDelay / routeCount) : 0;
+    std::println("Average Network Delay: {} ms", averageDelay);
+
+    return static_cast<std::uint32_t>(averageDelay);
 }
 
 } // namespace netd
