@@ -20,7 +20,6 @@
 #define NET_DESIGN_MENU_CONTROLLER_HPP
 
 #include <NetDesign/ProjectController.hpp>
-#include <NetDesign/InfoController.hpp>
 #include <NetDesign/MenuView.hpp>
 
 
@@ -29,7 +28,6 @@ namespace netd {
 class MenuController : public QObject
 {
     ProjectController m_projectController;
-    InfoController    m_infoController;
 
     public:
         MenuController(void) noexcept = default;
@@ -46,12 +44,6 @@ class MenuController : public QObject
 
         /** @brief "Project" Exit action handler.*/
         void onProjectExit(void) noexcept;
-
-        /** @brief "Info" Documentation action handler.*/
-        void onInfoDocs(void) noexcept;
-
-        /** @brief "Info" About action handler.*/
-        void onInfoAbout(void) noexcept;
 };
 
 } // namespace netd

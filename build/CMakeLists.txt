@@ -27,7 +27,6 @@ set(SRCS
     "${CONTROLLER_DIR}/GraphController.cpp"
     "${CONTROLLER_DIR}/NodeController.cpp"
     "${CONTROLLER_DIR}/MenuController.cpp"
-    "${CONTROLLER_DIR}/InfoController.cpp"
     "${CONTROLLER_DIR}/TabController.cpp"
     "${VIEW_DIR}/SettingsView.cpp"
     "${VIEW_DIR}/RouterView.cpp"

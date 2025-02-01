@@ -36,12 +36,7 @@ void MenuView::createMenus(void) noexcept
     auto saveAction  = projectMenu->addAction("Save");
     auto exitAction  = projectMenu->addAction("Exit");
 
-    // "Info" menu
-    auto infoMenu    = m_menu->addMenu("Info");
-    auto docsAction  = infoMenu->addAction("Documentation");
-    auto aboutAction = infoMenu->addAction("About");
-
-    m_actions = {newAction, openAction, saveAction, exitAction, docsAction, aboutAction};
+    m_actions = {newAction, openAction, saveAction, exitAction};
 }
 
 QList<QAction*>& MenuView::getActions(void) noexcept
