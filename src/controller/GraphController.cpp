@@ -173,22 +173,50 @@ void GraphController::insertEdgeTableRow(bool flag) noexcept
 }
 
 void GraphController::updateEdgeTable(void) noexcept
-{   const auto& context = ProjectContext::instance();
-    auto& table         = m_graphView->m_edgeTable;
+{
+    const auto& context = ProjectContext::instance();
+    auto& table = m_graphView->m_edgeTable;
 
-    // clear table
+    // Clear the edge table
     table->setRowCount(0);
 
-    // fill the table with combo boxes
-    auto rows = static_cast<std::int32_t>(context.m_edgeTable.size1());
-
-    for (std::int32_t row = 0; row < rows; row++)
+    // Fill the edge table with combo boxes
+    auto edgeRows = static_cast<std::int32_t>(context.m_edgeTable.size1());
+    for (std::int32_t row = 0; row < edgeRows; row++)
         insertEdgeTableRow(true);
+
+    auto& loadTable = m_graphView->m_loadTable;
+
+    // Clear the load table
+    loadTable->setRowCount(0);
+
+    // Fill the load table with combo boxes
+    auto nodeRows = static_cast<std::int32_t>(context.m_nodes.size());
+
+    // Initialize loads vector with the size of nodes
+    std::vector<std::uint32_t> loads(nodeRows, 0);
+
+    // Calculate loads for each node
+    for (std::size_t i = 0; i < static_cast<std::uint32_t>(nodeRows); i++) {
+        std::uint32_t load = 0;
+        for (std::size_t j = 0; j < context.m_loadMatrix.size2(); j++)
+            load += context.m_loadMatrix(i, j);
+        loads[i] = load;
+    }
+
+    // Populate the load table
+    for (std::int32_t row = 0; row < nodeRows; row++) {
+        int loadTableRow = loadTable->rowCount(); // Use a different variable for load table row
+        loadTable->insertRow(loadTableRow);
+
+        // Set the node name and load in the load table
+        loadTable->setItem(loadTableRow, 0, new QTableWidgetItem(QString::fromStdString(context.m_nodes.at(row).m_name)));
+        loadTable->setItem(loadTableRow, 1, new QTableWidgetItem(QString::number(loads.at(row))));
+    }
 }
 
 void GraphController::updateContent(void) noexcept
 {
-    // printProjectContext();
     updateEdgeTable();
     m_graph.m_adjList.clear();
     m_graph.set();
@@ -266,8 +294,6 @@ std::tuple<std::uint32_t, std::uint32_t> GraphController::calculateRouteDelay(vo
 
         for (std::size_t i = 0; i < distances.size(); ++i)
             std::println("To node {}: {}", i, distances[i]);
-
-        std::uint32_t totalPrice {0};
 
         if (distances[destPos] == std::numeric_limits<std::int32_t>::max()) {
             m_graphView->m_routeDelayLabel->setText("Route Delay: 0 ms");

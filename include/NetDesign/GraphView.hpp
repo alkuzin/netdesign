@@ -58,6 +58,7 @@ class GraphView : public QObject
         QPushButton  *m_updateButton;
 
         QTableWidget *m_edgeTable;
+        QTableWidget *m_loadTable;
         QPushButton  *m_addButton;
         QPushButton  *m_removeButton;
         QPushButton  *m_submitButton;

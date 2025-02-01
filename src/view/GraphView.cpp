@@ -68,6 +68,10 @@ void GraphView::setEdgeTable(void) noexcept
     m_edgeTable = new QTableWidget(0, 3, m_tab);
     m_edgeTable->setHorizontalHeaderLabels({"Source Node", "Destination Node", "Channel"});
     m_edgeTable->setMaximumWidth(315);
+
+    m_loadTable = new QTableWidget(0, 2, m_tab);
+    m_loadTable->setHorizontalHeaderLabels({"Node", "Load"});
+    m_loadTable->setMaximumWidth(315);
 }
 
 void GraphView::setButtonLayout(void) noexcept
@@ -104,6 +108,7 @@ void GraphView::setButtonLayout(void) noexcept
     m_buttonLayout->addWidget(m_findRouteButton);
     m_buttonLayout->addWidget(m_updateButton);
     m_buttonLayout->addWidget(m_edgeTable);
+    m_buttonLayout->addWidget(m_loadTable);
     m_buttonLayout->addWidget(m_addButton);
     m_buttonLayout->addWidget(m_removeButton);
     m_buttonLayout->addWidget(m_submitButton);
